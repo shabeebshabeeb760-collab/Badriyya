@@ -1,0 +1,51 @@
+.income-page{
+    padding:30px;
+    background:#f4f7fb;
+    min-height:100vh;
+}
+
+.income-card{
+    max-width:700px;
+    margin:auto;
+    background:#fff;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+.income-card h2{
+    margin-bottom:20px;
+    color:#0B4BB3;
+}
+
+.income-card form{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.income-card input,
+.income-card textarea{
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    font-size:16px;
+}
+
+.income-card textarea{
+    min-height:100px;
+}
+
+.income-card button{
+    padding:14px;
+    border:none;
+    background:#0B4BB3;
+    color:#fff;
+    font-size:17px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.income-card button:hover{
+    background:#083a8a;
+}

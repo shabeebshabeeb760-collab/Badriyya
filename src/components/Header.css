@@ -1,0 +1,196 @@
+/* ===========================
+   PREMIUM HEADER
+=========================== */
+
+.header{
+    width:100%;
+    background:#fff;
+    border-radius:20px;
+    padding:18px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    margin-bottom:25px;
+}
+
+/* LEFT */
+
+.header-left{
+    display:flex;
+    flex-direction:column;
+}
+
+.header-left h1{
+    font-size:38px;
+    font-weight:700;
+    color:#0B4BB3;
+    margin:0;
+}
+
+.header-left p{
+    margin-top:6px;
+    color:#666;
+    font-size:15px;
+}
+
+/* SEARCH */
+
+.header-search{
+    flex:1;
+    display:flex;
+    justify-content:center;
+}
+
+.header-search input{
+    width:100%;
+    max-width:430px;
+    height:50px;
+    border:1px solid #ddd;
+    border-radius:30px;
+    padding:0 20px;
+    outline:none;
+    font-size:15px;
+    transition:.3s;
+}
+
+.header-search input:focus{
+    border-color:#0B4BB3;
+    box-shadow:0 0 0 4px rgba(11,75,179,.10);
+}
+
+/* RIGHT */
+
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:25px;
+}
+
+/* NOTIFICATION */
+
+.notification{
+    position:relative;
+    cursor:pointer;
+}
+
+.notification svg{
+    font-size:30px;
+    color:#0B4BB3;
+}
+
+.notification span{
+    position:absolute;
+    top:-8px;
+    right:-8px;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:#ef4444;
+    color:#fff;
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+}
+
+/* ADMIN */
+
+.admin{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.admin-icon{
+    font-size:48px;
+    color:#0B4BB3;
+}
+
+.admin h4{
+    margin:0;
+    color:#222;
+    font-size:20px;
+}
+
+.admin p{
+    margin:3px 0 0;
+    color:#666;
+    font-size:14px;
+}
+
+/* MENU BUTTON */
+
+.menu-btn{
+    width:52px;
+    height:52px;
+    border:none;
+    border-radius:14px;
+    background:#0B4BB3;
+    color:#fff;
+    cursor:pointer;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    transition:.3s;
+}
+
+.menu-btn:hover{
+    background:#083B91;
+    transform:scale(1.05);
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media(max-width:768px){
+
+.header{
+    padding:15px;
+    flex-wrap:wrap;
+    gap:15px;
+}
+
+.menu-btn{
+    display:flex;
+}
+
+.header-left h1{
+    font-size:28px;
+}
+
+.header-search{
+    order:3;
+    width:100%;
+}
+
+.header-search input{
+    max-width:100%;
+}
+
+.header-right{
+    margin-left:auto;
+    gap:15px;
+}
+
+.admin p{
+    display:none;
+}
+
+.admin h4{
+    font-size:16px;
+}
+
+.admin-icon{
+    font-size:38px;
+}
+
+.notification svg{
+    font-size:26px;
+}
+
+}

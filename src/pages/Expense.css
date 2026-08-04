@@ -1,0 +1,52 @@
+.expense-page{
+    padding:30px;
+    background:#f4f7fb;
+    min-height:100vh;
+}
+
+.expense-card{
+    max-width:700px;
+    margin:auto;
+    background:#fff;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+.expense-card h2{
+    color:#d32f2f;
+    margin-bottom:20px;
+}
+
+.expense-card form{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.expense-card input,
+.expense-card textarea,
+.expense-card select{
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    font-size:16px;
+}
+
+.expense-card textarea{
+    min-height:100px;
+}
+
+.expense-card button{
+    padding:14px;
+    border:none;
+    background:#d32f2f;
+    color:white;
+    font-size:17px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.expense-card button:hover{
+    background:#b71c1c;
+}

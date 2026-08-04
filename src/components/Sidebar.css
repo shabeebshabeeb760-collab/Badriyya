@@ -1,0 +1,237 @@
+/* ===========================
+   PREMIUM SIDEBAR
+=========================== */
+
+.sidebar{
+  position:fixed;
+  top:0;
+  left:0;
+  width:280px;
+  height:100vh;
+  background:linear-gradient(180deg,#0B4BB3,#08429D,#062B73);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  box-shadow:8px 0 25px rgba(0,0,0,.18);
+  transition:left .35s ease;
+  z-index:1000;
+  overflow:hidden;
+}
+
+/* Background Effect */
+
+.sidebar::before{
+  content:"";
+  position:absolute;
+  width:250px;
+  height:250px;
+  background:rgba(255,255,255,.08);
+  border-radius:50%;
+  top:-120px;
+  left:-100px;
+}
+
+.sidebar::after{
+  content:"";
+  position:absolute;
+  width:180px;
+  height:180px;
+  background:rgba(255,255,255,.05);
+  border-radius:50%;
+  bottom:-70px;
+  right:-70px;
+}
+
+/* ===========================
+   LOGO
+=========================== */
+
+.logo{
+  position:relative;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:30px 20px;
+}
+
+.sidebar-logo{
+  width:90px;
+  height:90px;
+  object-fit:contain;
+  background:#fff;
+  border-radius:50%;
+  padding:8px;
+  box-shadow:
+  0 0 25px rgba(255,255,255,.35),
+  0 8px 25px rgba(0,0,0,.25);
+}
+
+.logo h2{
+  margin-top:15px;
+  font-size:24px;
+  font-weight:700;
+  color:#fff;
+}
+
+.logo p{
+  margin-top:5px;
+  font-size:13px;
+  color:#dbeafe;
+  text-align:center;
+}
+
+/* ===========================
+   MENU
+=========================== */
+
+.sidebar ul{
+  list-style:none;
+  padding:15px;
+  flex:1;
+  position:relative;
+  z-index:2;
+}
+
+.sidebar ul li{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  padding:15px 18px;
+  margin-bottom:10px;
+  border-radius:14px;
+  cursor:pointer;
+  transition:.3s;
+  font-size:16px;
+}
+
+.sidebar ul li svg{
+  font-size:20px;
+}
+
+.sidebar ul li:hover{
+  background:rgba(255,255,255,.15);
+  transform:translateX(6px);
+}
+
+.sidebar ul li.active{
+  background:#fff;
+  color:#0B4BB3;
+  font-weight:700;
+  box-shadow:0 10px 20px rgba(0,0,0,.18);
+}
+
+.sidebar ul li.active svg{
+  color:#0B4BB3;
+}
+
+/* ===========================
+   LOGOUT
+=========================== */
+
+.logout{
+  margin:20px;
+  padding:15px;
+  border:none;
+  border-radius:14px;
+  background:#ef4444;
+  color:#fff;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  transition:.3s;
+}
+
+.logout:hover{
+  background:#dc2626;
+  transform:translateY(-2px);
+}
+
+/* ===========================
+   CLOSE BUTTON
+=========================== */
+
+.close-btn{
+  display:none;
+  position:absolute;
+  top:15px;
+  right:15px;
+  background:none;
+  border:none;
+  color:#fff;
+  font-size:24px;
+  cursor:pointer;
+  z-index:1200;
+}
+
+/* ===========================
+   OVERLAY
+=========================== */
+
+.sidebar-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  z-index:999;
+}
+
+/* ===========================
+   DESKTOP
+=========================== */
+
+.menu-btn{
+  display:none;
+}
+
+.main{
+  margin-left:280px;
+  transition:.3s;
+}
+
+/* ===========================
+   MOBILE
+=========================== */
+
+@media(max-width:768px){
+
+  .sidebar{
+    left:-280px;
+  }
+
+  .sidebar.open{
+    left:0;
+  }
+
+  .main{
+    margin-left:0;
+    padding-top:70px;
+  }
+
+  .menu-btn{
+    display:flex;
+    position:fixed;
+    top:15px;
+    left:15px;
+    width:45px;
+    height:45px;
+    border:none;
+    border-radius:10px;
+    background:#0B4BB3;
+    color:#fff;
+    font-size:22px;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:1200;
+    box-shadow:0 8px 20px rgba(0,0,0,.2);
+  }
+
+  .close-btn{
+    display:block;
+  }
+}

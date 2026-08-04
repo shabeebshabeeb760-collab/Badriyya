@@ -1,0 +1,185 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
+
+body{
+  background:#eef5ff;
+}
+
+/* LOGIN PAGE */
+
+.login-page{
+  width:100%;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#0B4BB3,#6EA8FE);
+}
+
+.login-card{
+  width:450px;
+  background:#fff;
+  padding:40px;
+  border-radius:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,.15);
+  text-align:center;
+}
+
+.logo{
+  width:120px;
+  margin-bottom:15px;
+}
+
+.title{
+  color:#0B4BB3;
+  font-size:22px;
+  font-weight:700;
+  margin-bottom:30px;
+}
+
+.input-box{
+  display:flex;
+  align-items:center;
+  border:1px solid #d9d9d9;
+  border-radius:12px;
+  padding:0 15px;
+  margin-bottom:20px;
+  background:#fff;
+}
+
+.input-box .icon{
+  font-size:18px;
+  color:#0B4BB3;
+  margin-right:12px;
+  min-width:20px;
+}
+
+.input{
+  flex:1;
+  border:none;
+  outline:none;
+  background:transparent;
+  font-size:16px;
+  padding:16px 0;
+}
+
+.eye{
+  font-size:18px;
+  color:#777;
+  cursor:pointer;
+}
+
+.login-btn{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:12px;
+  background:#0B4BB3;
+  color:#fff;
+  font-size:18px;
+  font-weight:600;
+  cursor:pointer;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  transition:.3s;
+}
+
+.login-btn:hover{
+  background:#083a8a;
+}
+
+.or{
+  margin:20px 0;
+  color:#888;
+}
+
+.secure{
+  background:#EEF5FF;
+  color:#0B4BB3;
+  padding:15px;
+  border-radius:12px;
+  font-size:15px;
+  font-weight:600;
+  margin-bottom:20px;
+}
+
+.footer{
+  font-size:13px;
+  color:#666;
+}
+.logo{
+  display:block;
+  width:150px;
+  height:auto;
+  margin:0 auto 20px;
+}
+
+.title{
+  text-align:center;
+  color:#0B4BB3;
+  font-size:22px;
+  font-weight:700;
+  margin-bottom:25px;
+}
+
+.input-box{
+  display:flex;
+  align-items:center;
+  border:1px solid #d8d8d8;
+  border-radius:12px;
+  padding:0 14px;
+  margin-bottom:18px;
+  background:#fff;
+}
+
+.input-box .icon{
+  font-size:16px;
+  color:#0B4BB3;
+}
+
+.input{
+  flex:1;
+  border:none;
+  outline:none;
+  padding:15px 12px;
+  font-size:15px;
+  background:transparent;
+}
+
+.eye{
+  font-size:16px;
+  color:#666;
+  cursor:pointer;
+}
+
+.login-card{
+  width:430px;
+  max-width:95%;
+  padding:35px;
+  border-radius:20px;
+  background:#fff;
+  box-shadow:0 15px 40px rgba(0,0,0,.15);
+}
+
+@media (max-width:900px){
+
+.logo{
+  width:200px;
+}
+
+.login-card{
+  width:95%;
+  padding:25px;
+}
+
+.title{
+  font-size:18px;
+}
+
+}
