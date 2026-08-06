@@ -1,0 +1,393 @@
+/* ===========================
+   REPORT PAGE
+=========================== */
+
+.report-summary{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:20px;
+    margin:25px 0;
+}
+
+.report-summary .box{
+    background:#fff;
+    border-radius:18px;
+    padding:22px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    transition:.3s;
+}
+
+.report-summary .box:hover{
+    transform:translateY(-5px);
+}
+
+.report-summary svg{
+    font-size:38px;
+    color:#fff;
+    padding:16px;
+    border-radius:50%;
+}
+
+.green svg{
+    background:#16a34a;
+}
+
+.red svg{
+    background:#dc2626;
+}
+
+.blue svg{
+    background:#2563eb;
+}
+
+.report-summary h3{
+    font-size:14px;
+    color:#777;
+    margin-bottom:8px;
+}
+
+.report-summary h2{
+    font-size:28px;
+    color:#111827;
+}
+
+/* ===========================
+   SEARCH BAR
+=========================== */
+
+.report-toolbar{
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:25px;
+}
+
+.search-box{
+    background:#fff;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 18px;
+    border-radius:12px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+.search-box input{
+    border:none;
+    outline:none;
+    font-size:15px;
+    width:260px;
+}
+
+/* ===========================
+   DATE FILTER
+=========================== */
+
+.date-filter{
+    background:#fff;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 18px;
+    border-radius:12px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+.date-filter input{
+    border:none;
+    outline:none;
+    font-size:15px;
+}
+
+.pdf-btn{
+    background:#dc2626;
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    padding:12px 20px;
+    font-size:15px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.pdf-btn:hover{
+    background:#b91c1c;
+}
+/* ===========================
+   REPORT TABLE
+=========================== */
+
+.report-table{
+    background:#fff;
+    border-radius:18px;
+    padding:25px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    overflow-x:auto;
+}
+
+.report-table h2{
+    color:#0B4BB3;
+    margin-bottom:20px;
+    font-size:24px;
+    font-weight:700;
+}
+
+.report-table table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:900px;
+}
+
+.report-table thead{
+    background:#0B4BB3;
+}
+
+.report-table thead th{
+    color:#fff;
+    padding:16px;
+    font-size:15px;
+    font-weight:600;
+    text-align:left;
+}
+
+.report-table tbody tr{
+    border-bottom:1px solid #edf2f7;
+    transition:.25s;
+}
+
+.report-table tbody tr:hover{
+    background:#f8fbff;
+}
+
+.report-table tbody td{
+    padding:15px;
+    color:#374151;
+    font-size:15px;
+}
+
+/* ===========================
+   TYPE BADGES
+=========================== */
+
+.income-badge{
+    display:inline-block;
+    background:#dcfce7;
+    color:#15803d;
+    padding:6px 14px;
+    border-radius:50px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.expense-badge{
+    display:inline-block;
+    background:#fee2e2;
+    color:#b91c1c;
+    padding:6px 14px;
+    border-radius:50px;
+    font-size:13px;
+    font-weight:600;
+}
+
+/* ===========================
+   ACTION BUTTONS
+=========================== */
+
+.edit-btn,
+.delete-btn{
+    border:none;
+    border-radius:8px;
+    padding:9px 14px;
+    color:#fff;
+    cursor:pointer;
+    font-size:14px;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    transition:.25s;
+}
+
+.edit-btn{
+    background:#2563eb;
+}
+
+.edit-btn:hover{
+    background:#1d4ed8;
+}
+
+.delete-btn{
+    background:#dc2626;
+}
+
+.delete-btn:hover{
+    background:#b91c1c;
+}
+/* ===========================
+   RESPONSIVE DESIGN
+=========================== */
+
+@media (max-width: 1024px){
+
+  .report-toolbar{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .search-box,
+  .date-filter{
+    width:100%;
+  }
+
+  .search-box input{
+    width:100%;
+  }
+
+  .pdf-btn{
+    width:100%;
+    justify-content:center;
+  }
+
+}
+
+@media (max-width:768px){
+
+  .report-summary{
+    grid-template-columns:1fr;
+  }
+
+  .report-summary .box{
+    padding:18px;
+  }
+
+  .report-summary h2{
+    font-size:22px;
+  }
+
+  .report-table{
+    padding:15px;
+    overflow-x:auto;
+  }
+
+  .report-table table{
+    min-width:750px;
+  }
+
+  .report-table thead th,
+  .report-table tbody td{
+    padding:12px;
+    font-size:14px;
+  }
+
+  .search-box,
+  .date-filter{
+    padding:10px 14px;
+  }
+
+  .date-filter{
+    flex-wrap:wrap;
+  }
+
+  .date-filter span{
+    display:none;
+  }
+
+  .pdf-btn{
+    padding:12px;
+    font-size:15px;
+  }
+
+}
+
+@media (max-width:480px){
+
+  .report-summary .box{
+    flex-direction:column;
+    text-align:center;
+    gap:12px;
+  }
+
+  .report-summary svg{
+    font-size:30px;
+    padding:14px;
+  }
+
+  .report-summary h2{
+    font-size:20px;
+  }
+
+  .report-summary h3{
+    font-size:13px;
+  }
+
+  .search-box input{
+    font-size:14px;
+  }
+
+  .report-table h2{
+    font-size:18px;
+  }
+
+  .edit-btn,
+  .delete-btn{
+    width:100%;
+    justify-content:center;
+    padding:10px;
+  }
+
+}
+
+/* ===========================
+   SMOOTH ANIMATIONS
+=========================== */
+
+.report-summary .box,
+.report-table,
+.search-box,
+.date-filter,
+.pdf-btn,
+.edit-btn,
+.delete-btn{
+  transition:all .3s ease;
+}
+
+.report-summary .box:hover,
+.report-table:hover{
+  box-shadow:0 15px 35px rgba(0,0,0,.12);
+}
+
+.edit-btn:hover,
+.delete-btn:hover,
+.pdf-btn:hover{
+  transform:translateY(-2px);
+}
+
+.search-box:focus-within,
+.date-filter:focus-within{
+  box-shadow:0 0 0 3px rgba(11,75,179,.15);
+}
+
+/* ===========================
+   CUSTOM SCROLLBAR
+=========================== */
+
+.report-table::-webkit-scrollbar{
+  height:8px;
+}
+
+.report-table::-webkit-scrollbar-track{
+  background:#e5e7eb;
+  border-radius:10px;
+}
+
+.report-table::-webkit-scrollbar-thumb{
+  background:#0B4BB3;
+  border-radius:10px;
+}
+
+.report-table::-webkit-scrollbar-thumb:hover{
+  background:#083b91;
+}

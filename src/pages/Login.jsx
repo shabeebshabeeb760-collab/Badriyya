@@ -6,7 +6,7 @@ import {
   FaEye,
   FaEyeSlash,
   FaSignInAlt,
-  FaShieldAlt,
+  FaShieldAlt
 } from "react-icons/fa";
 
 import "../App.css";
@@ -20,7 +20,7 @@ function Login() {
   const [show, setShow] = useState(false);
 
   const login = () => {
-    if (username === "admin" && password === "admin123") {
+    if (username === "Badriyya26" && password === "Badriyya99") {
       navigate("/dashboard");
     } else {
       alert("Invalid Username or Password");

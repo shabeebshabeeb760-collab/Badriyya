@@ -75,18 +75,20 @@ function Dashboard() {
         updateDashboard();
       }
     );
+const unsubscribeExpense = onSnapshot(
+  collection(db, "expenses"),
+  (snapshot) => {
+    expenseData = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
-    const unsubscribeExpense = onSnapshot(
-      collection(db, "expense"),
-      (snapshot) => {
-        expenseData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        updateDashboard();
-      }
-    );
+    updateDashboard();
+  },
+  (error) => {
+    console.error("Expense Error:", error);
+  }
+);
 
     return () => {
       unsubscribeIncome();
