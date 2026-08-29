@@ -1,0 +1,377 @@
+* {
+  box-sizing: border-box;
+}
+
+.receipt-page {
+  min-height: 100vh;
+  background: #eeeeee;
+  padding: 20px;
+}
+
+/* ===============================
+   BUTTONS
+================================ */
+
+.receipt-actions {
+  width: 1129px;
+  max-width: 100%;
+  margin: 0 auto 15px;
+
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.receipt-actions button {
+  border: 0;
+  border-radius: 5px;
+  padding: 9px 14px;
+
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.back-button {
+  margin-right: auto;
+  background: #555;
+}
+
+.print-button {
+  background: #0877df;
+}
+
+.pdf-button {
+  background: #168447;
+}
+
+
+/* ===============================
+   RECEIPT
+================================ */
+
+.receipt {
+  position: relative;
+
+  width: 1129px;
+  max-width: 100%;
+
+  margin: 0 auto;
+
+  background: white;
+
+  overflow: hidden;
+}
+
+.receipt-image {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  margin: 0;
+  padding: 0;
+}
+
+
+/* ===============================
+   DATE
+
+   Image size = 1129 x 1600
+
+   Date goes exactly after
+   "Date:"
+================================ */
+
+.dynamic-date {
+  position: absolute;
+
+  left: 70.5%;
+  top: 18.15%;
+
+  z-index: 20;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  font-size: 21px;
+  font-weight: 600;
+
+  color: #222;
+
+  white-space: nowrap;
+}
+
+
+/* ===============================
+   COVER OLD STATIC NAME
+
+   The uploaded image already has
+   an old printed name.
+
+   This white area hides it.
+================================ */
+
+.name-cover {
+  position: absolute;
+
+  left: 11.8%;
+  top: 41.9%;
+
+  width: 65%;
+  height: 4.0%;
+
+  z-index: 15;
+
+  background: white;
+}
+
+
+/* ===============================
+   NEW FIREBASE NAME
+================================ */
+
+.dynamic-name {
+  position: absolute;
+
+  left: 12%;
+  top: 42.35%;
+
+  width: 70%;
+
+  z-index: 20;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  font-size: 29px;
+  font-weight: 800;
+
+  line-height: 1.15;
+
+  color: #202020;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* ===============================
+   CASH BOX
+================================ */
+
+.dynamic-cash {
+  position: absolute;
+
+  left: 11.25%;
+  top: 47.2%;
+
+  width: 23.5%;
+  height: 4.75%;
+
+  z-index: 20;
+
+  display: flex;
+
+  overflow: hidden;
+
+  border: 2px solid #777;
+
+  border-radius: 9px;
+
+  background: white;
+}
+
+
+/* ===============================
+   RUPEE
+================================ */
+
+.cash-rupee {
+  width: 29%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background: #284bc9;
+
+  color: white;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 35px;
+  font-weight: 500;
+}
+
+
+/* ===============================
+   CASH CONTENT
+================================ */
+
+.cash-content {
+  flex: 1;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+
+  background: white;
+}
+
+
+/* CASH */
+
+.cash-text {
+  font-family: Arial, Helvetica, sans-serif;
+
+  font-size: 18px;
+  font-weight: 800;
+
+  letter-spacing: 1px;
+
+  color: #222;
+}
+
+
+/* AMOUNT */
+
+.cash-amount {
+  font-family: Arial, Helvetica, sans-serif;
+
+  font-size: 18px;
+  font-weight: 800;
+
+  color: #222;
+}
+
+
+/* ===============================
+   LOADING
+================================ */
+
+.receipt-loading {
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 22px;
+  font-weight: 700;
+}
+
+
+/* ===============================
+   ERROR
+================================ */
+
+.receipt-error {
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 15px;
+}
+
+.receipt-error button {
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 5px;
+
+  background: #1769d1;
+  color: white;
+
+  cursor: pointer;
+}
+
+
+/* ===============================
+   MOBILE
+================================ */
+
+@media (max-width: 600px) {
+
+  .receipt-page {
+    padding: 5px;
+  }
+
+  .receipt-actions {
+    gap: 4px;
+  }
+
+  .receipt-actions button {
+    padding: 7px 8px;
+    font-size: 10px;
+  }
+
+  .dynamic-date {
+    font-size: 7px;
+  }
+
+  .dynamic-name {
+    font-size: 11px;
+  }
+
+  .cash-rupee {
+    font-size: 14px;
+  }
+
+  .cash-text,
+  .cash-amount {
+    font-size: 7px;
+  }
+
+  .cash-content {
+    gap: 3px;
+  }
+}
+
+
+/* ===============================
+   PRINT
+================================ */
+
+@media print {
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: white !important;
+  }
+
+  .receipt-page {
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: white !important;
+  }
+
+  .receipt-actions {
+    display: none !important;
+  }
+
+  .receipt {
+    width: 100% !important;
+    max-width: none !important;
+
+    margin: 0 !important;
+  }
+}

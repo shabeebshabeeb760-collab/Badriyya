@@ -54,7 +54,7 @@ function Sidebar({ open, setOpen }) {
 
   return (
     <>
-      {/* Overlay */}
+      {/* MOBILE OVERLAY */}
       {open && (
         <div
           className="sidebar-overlay"
@@ -62,18 +62,19 @@ function Sidebar({ open, setOpen }) {
         />
       )}
 
-      {/* Sidebar */}
-      <div className={`sidebar ${open ? "open" : ""}`}>
+      {/* SIDEBAR */}
+      <aside className={`sidebar ${open ? "open" : ""}`}>
 
-        {/* Mobile Close Button */}
+        {/* CLOSE BUTTON */}
         <button
+          type="button"
           className="close-btn"
           onClick={() => setOpen(false)}
         >
           <FaTimes />
         </button>
 
-        {/* Logo */}
+        {/* LOGO */}
         <div className="logo">
           <img
             src={logo}
@@ -86,7 +87,7 @@ function Sidebar({ open, setOpen }) {
           <p>Finance Management System</p>
         </div>
 
-        {/* Menu */}
+        {/* MENU */}
         <ul>
           {menu.map((item) => (
             <li
@@ -104,22 +105,20 @@ function Sidebar({ open, setOpen }) {
           ))}
         </ul>
 
-        {/* Logout */}
+        {/* LOGOUT */}
         <button
+          type="button"
           className="logout"
           onClick={() => {
             navigate("/");
-
-            if (window.innerWidth <= 768) {
-              setOpen(false);
-            }
+            setOpen(false);
           }}
         >
           <FaSignOutAlt />
-          Logout
+          <span>Logout</span>
         </button>
 
-      </div>
+      </aside>
     </>
   );
 }

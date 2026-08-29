@@ -1,6 +1,6 @@
-/* ===========================
-   BADRIYYA PREMIUM SIDEBAR
-=========================== */
+/* =================================
+   BADRIYYA FINANCE SIDEBAR
+================================= */
 
 .sidebar {
   position: fixed;
@@ -9,6 +9,7 @@
 
   width: 280px;
   height: 100vh;
+  height: 100dvh;
 
   background: linear-gradient(
     180deg,
@@ -24,69 +25,27 @@
 
   box-shadow: 8px 0 25px rgba(0, 0, 0, 0.18);
 
-  z-index: 1000;
+  z-index: 2000;
 
   overflow: hidden;
 
   transform: translateX(0);
+
   transition: transform 0.3s ease;
 }
 
-
-/* ===========================
-   BACKGROUND EFFECT
-=========================== */
-
-.sidebar::before {
-  content: "";
-
-  position: absolute;
-
-  width: 250px;
-  height: 250px;
-
-  background: rgba(255, 255, 255, 0.08);
-
-  border-radius: 50%;
-
-  top: -120px;
-  left: -100px;
-
-  pointer-events: none;
-}
-
-.sidebar::after {
-  content: "";
-
-  position: absolute;
-
-  width: 180px;
-  height: 180px;
-
-  background: rgba(255, 255, 255, 0.05);
-
-  border-radius: 50%;
-
-  bottom: -70px;
-  right: -70px;
-
-  pointer-events: none;
-}
-
-
-/* ===========================
+/* =================================
    LOGO
-=========================== */
+================================= */
 
 .logo {
-  position: relative;
-  z-index: 2;
-
   display: flex;
   flex-direction: column;
   align-items: center;
 
   padding: 30px 20px 25px;
+
+  flex-shrink: 0;
 }
 
 .sidebar-logo {
@@ -125,33 +84,20 @@
   text-align: center;
 }
 
-
-/* ===========================
+/* =================================
    MENU
-=========================== */
+================================= */
 
 .sidebar ul {
   list-style: none;
 
   padding: 15px;
+
   margin: 0;
 
   flex: 1;
 
-  position: relative;
-  z-index: 2;
-
   overflow-y: auto;
-}
-
-.sidebar ul::-webkit-scrollbar {
-  width: 4px;
-}
-
-.sidebar ul::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.25);
-
-  border-radius: 10px;
 }
 
 .sidebar ul li {
@@ -168,11 +114,11 @@
 
   cursor: pointer;
 
+  font-size: 16px;
+
   transition:
     background 0.2s ease,
     transform 0.2s ease;
-
-  font-size: 16px;
 }
 
 .sidebar ul li svg {
@@ -202,16 +148,11 @@
   color: #0b4bb3;
 }
 
-
-/* ===========================
+/* =================================
    LOGOUT
-=========================== */
+================================= */
 
 .logout {
-  position: relative;
-
-  z-index: 2;
-
   margin: 15px 20px 20px;
 
   padding: 15px;
@@ -236,7 +177,11 @@
 
   gap: 10px;
 
-  transition: 0.2s ease;
+  flex-shrink: 0;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .logout:hover {
@@ -245,10 +190,9 @@
   transform: translateY(-2px);
 }
 
-
-/* ===========================
+/* =================================
    CLOSE BUTTON
-=========================== */
+================================= */
 
 .close-btn {
   display: none;
@@ -276,19 +220,12 @@
 
   cursor: pointer;
 
-  z-index: 1200;
-
-  transition: 0.2s ease;
+  z-index: 2100;
 }
 
-.close-btn:hover {
-  background: rgba(255, 255, 255, 0.22);
-}
-
-
-/* ===========================
+/* =================================
    OVERLAY
-=========================== */
+================================= */
 
 .sidebar-overlay {
   position: fixed;
@@ -297,34 +234,12 @@
 
   background: rgba(0, 0, 0, 0.45);
 
-  z-index: 999;
-
-  animation: overlayFade 0.25s ease;
+  z-index: 1900;
 }
 
-@keyframes overlayFade {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-
-/* ===========================
-   DESKTOP
-=========================== */
-
-.menu-btn {
-  display: none;
-}
-
-
-/* ===========================
-   MAIN CONTENT
-=========================== */
+/* =================================
+   MAIN
+================================= */
 
 .main {
   margin-left: 280px;
@@ -332,142 +247,40 @@
   transition: margin-left 0.3s ease;
 }
 
-
-/* ===========================
-   TABLET
-=========================== */
-
-@media (max-width: 1024px) {
-
-  .sidebar {
-    width: 250px;
-  }
-
-  .main {
-    margin-left: 250px;
-  }
-
-  .logo {
-    padding: 25px 15px 20px;
-  }
-
-  .sidebar-logo {
-    width: 80px;
-    height: 80px;
-  }
-
-  .logo h2 {
-    font-size: 22px;
-  }
-
-  .logo p {
-    font-size: 12px;
-  }
-
-  .sidebar ul li {
-    padding: 13px 15px;
-
-    font-size: 15px;
-  }
-}
-
-
-/* ===========================
+/* =================================
    MOBILE
-=========================== */
+================================= */
 
 @media (max-width: 768px) {
-
-  /* SIDEBAR */
 
   .sidebar {
     width: 280px;
 
+    height: 100vh;
     height: 100dvh;
 
-    transform: translateX(-105%);
+    transform: translateX(-110%);
 
-    box-shadow:
-      10px 0 35px rgba(0, 0, 0, 0.30);
-
-    transition:
-      transform 0.3s ease;
+    z-index: 2000;
   }
 
+  /* IMPORTANT */
   .sidebar.open {
     transform: translateX(0);
   }
 
-
-  /* MAIN */
-
   .main {
     margin-left: 0 !important;
 
-    padding-top: 0;
-
     width: 100%;
-
-    box-sizing: border-box;
   }
-
-
-  /* ===========================
-     MOBILE MENU BUTTON
-  =========================== */
-
-  .menu-btn {
-    display: flex;
-
-    position: fixed;
-
-    top: 12px;
-    left: 12px;
-
-    width: 44px;
-    height: 44px;
-
-    border: none;
-
-    border-radius: 11px;
-
-    background: #0b4bb3;
-
-    color: #fff;
-
-    font-size: 21px;
-
-    align-items: center;
-    justify-content: center;
-
-    cursor: pointer;
-
-    z-index: 1200;
-
-    box-shadow:
-      0 6px 18px rgba(0, 0, 0, 0.20);
-
-    transition: 0.2s ease;
-  }
-
-  .menu-btn:active {
-    transform: scale(0.94);
-  }
-
-
-  /* CLOSE BUTTON */
 
   .close-btn {
     display: flex;
   }
 
-
-  /* ===========================
-     MOBILE LOGO
-  =========================== */
-
   .logo {
-    padding-top: 58px;
+    padding-top: 65px;
 
     padding-left: 15px;
     padding-right: 15px;
@@ -485,11 +298,6 @@
   .logo p {
     font-size: 11px;
   }
-
-
-  /* ===========================
-     MOBILE MENU
-  =========================== */
 
   .sidebar ul {
     padding: 12px;
@@ -511,11 +319,6 @@
     font-size: 18px;
   }
 
-
-  /* ===========================
-     MOBILE LOGOUT
-  =========================== */
-
   .logout {
     margin: 12px 16px 18px;
 
@@ -527,10 +330,9 @@
   }
 }
 
-
-/* ===========================
+/* =================================
    SMALL MOBILE
-=========================== */
+================================= */
 
 @media (max-width: 400px) {
 
@@ -549,13 +351,6 @@
 
   .logo p {
     font-size: 10px;
-  }
-
-  .menu-btn {
-    width: 42px;
-    height: 42px;
-
-    font-size: 19px;
   }
 
   .sidebar ul li {

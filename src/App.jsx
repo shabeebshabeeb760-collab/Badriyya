@@ -8,13 +8,14 @@ import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import CreditPurchase from "./pages/CreditPurchase";
 import CreditPurchaseCategory from "./pages/CreditPurchaseCategory";
+import Receipt from "./pages/Receipt";
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/dashboard" element={<Dashboard />} />
  
-
+<Route path="/receipt/:id" element={<Receipt />} />
       <Route path="/income" element={<Income />} />
       <Route path="/income/list" element={<IncomeList />} />
       <Route
