@@ -62,7 +62,9 @@ function Dashboard() {
       setTotalExpense(expense);
       setTodayIncome(todayInc);
       setTodayExpense(todayExp);
-      setTransactions(incomeData.length + expenseData.length);
+      setTransactions(
+        incomeData.length + expenseData.length
+      );
     };
 
     const unsubscribeIncome = onSnapshot(
@@ -106,19 +108,21 @@ function Dashboard() {
   return (
     <div className="dashboard">
 
-      <BackButton />
-
+      {/* SIDEBAR */}
       <Sidebar
         open={sidebarOpen}
         setOpen={setSidebarOpen}
       />
 
+      {/* MAIN CONTENT */}
       <div className="main">
 
+        {/* HEADER */}
         <Header
           setOpen={setSidebarOpen}
         />
 
+        {/* DASHBOARD CARDS */}
         <div className="cards">
 
           {/* TOTAL INCOME */}
@@ -186,6 +190,7 @@ function Dashboard() {
 
         </div>
 
+        {/* RECENT TRANSACTIONS */}
         <div className="recent">
 
           <h2>Recent Transactions</h2>
@@ -202,7 +207,10 @@ function Dashboard() {
 
             <tbody>
               <tr>
-                <td colSpan="3" style={{ textAlign: "center" }}>
+                <td
+                  colSpan="3"
+                  style={{ textAlign: "center" }}
+                >
                   Live transactions will appear here
                 </td>
               </tr>
