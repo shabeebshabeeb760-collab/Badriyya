@@ -9,7 +9,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase/firebase";
 import { downloadReport } from "../utils/pdfReport";
-
+import BackButton from "../components/BackButton";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 
@@ -151,6 +151,7 @@ function Reports() {
 
   return (
     <div className="dashboard">
+  <BackButton />
 
       <Sidebar
         open={sidebarOpen}

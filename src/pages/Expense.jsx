@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
+import BackButton from "../components/BackButton";
 import { db } from "../firebase/firebase";
 import "./Expense.css";
-
+import {
+  FaWallet,
+  FaSave,
+  FaArrowLeft
+} from "react-icons/fa";
 function Expense() {
   const [form, setForm] = useState({
     date: "",
@@ -47,6 +52,8 @@ function Expense() {
 
   return (
     <div className="expense-page">
+        <BackButton />
+
       <div className="expense-card">
 
         <h2>Add Expense</h2>
@@ -82,6 +89,7 @@ function Expense() {
             <option>Food</option>
             <option>Maintenance</option>
             <option>Office</option>
+            <option>Fish</option>
             <option>Other</option>
           </select>
 

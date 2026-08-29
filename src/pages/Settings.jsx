@@ -1,18 +1,21 @@
 import { useState } from "react";
 import "./Settings.css";
-
+import { useNavigate } from "react-router-dom";
+import BackButton from "../components/BackButton";
 function Settings() {
   const [schoolName, setSchoolName] = useState("DARUL ISLAM AL BADRIYYA");
   const [adminName, setAdminName] = useState("Admin");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-
+const navigate = useNavigate();
   const handleSave = () => {
     alert("Settings Saved Successfully");
   };
 
   return (
     <div className="settings-page">
+        <BackButton />
+
       <div className="settings-card">
         <h2>⚙️ Settings</h2>
 
@@ -44,8 +47,12 @@ function Settings() {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <button onClick={handleSave}>Save Settings</button>
-      </div>
+<button
+  className="back-btn"
+  onClick={() => navigate("/dashboard")}
+>
+  ← Back to Dashboard
+</button>      </div>
     </div>
   );
 }

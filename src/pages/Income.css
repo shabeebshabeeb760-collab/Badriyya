@@ -1,51 +1,303 @@
-.income-page{
-    padding:30px;
-    background:#f4f7fb;
-    min-height:100vh;
+/* =========================
+   INCOME PAGE
+========================= */
+
+.income-page {
+  min-height: 100vh;
+  padding: 30px;
+  background: #f3f6fb;
+  box-sizing: border-box;
 }
 
-.income-card{
-    max-width:700px;
-    margin:auto;
-    background:#fff;
-    padding:30px;
-    border-radius:15px;
-    box-shadow:0 5px 15px rgba(0,0,0,.08);
+/* =========================
+   INCOME FORM
+========================= */
+
+.income-card {
+  width: 100%;
+  max-width: 600px;
+  margin: 40px auto;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
 }
 
-.income-card h2{
-    margin-bottom:20px;
-    color:#0B4BB3;
+.income-card h2 {
+  margin: 0 0 25px;
+  text-align: center;
+  color: #0b4bb3;
+  font-size: 28px;
 }
 
-.income-card form{
-    display:flex;
-    flex-direction:column;
-    gap:15px;
+.income-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.income-card label {
+  font-weight: 600;
+  margin-top: 8px;
+  color: #333;
 }
 
 .income-card input,
-.income-card textarea{
-    padding:12px;
-    border:1px solid #ddd;
-    border-radius:8px;
-    font-size:16px;
+.income-card textarea {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #d5dce7;
+  border-radius: 9px;
+  font-size: 15px;
+  box-sizing: border-box;
+  outline: none;
 }
 
-.income-card textarea{
-    min-height:100px;
+.income-card input:focus,
+.income-card textarea:focus {
+  border-color: #0b4bb3;
+  box-shadow: 0 0 0 2px rgba(11, 75, 179, 0.08);
 }
 
-.income-card button{
-    padding:14px;
-    border:none;
-    background:#0B4BB3;
-    color:#fff;
-    font-size:17px;
-    border-radius:8px;
-    cursor:pointer;
+.income-card textarea {
+  min-height: 100px;
+  resize: vertical;
 }
 
-.income-card button:hover{
-    background:#083a8a;
+.income-card button {
+  margin-top: 18px;
+  padding: 14px;
+  border: none;
+  border-radius: 9px;
+  background: #0b4bb3;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.income-card button:hover {
+  background: #083d91;
+}
+
+.income-card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* =========================
+   RECEIPT SCREEN
+========================= */
+
+.receipt-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.88);
+  overflow: auto;
+  padding: 25px;
+  box-sizing: border-box;
+}
+
+/* =========================
+   TOOLBAR
+========================= */
+
+.receipt-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+
+  margin-bottom: 15px;
+}
+
+.receipt-toolbar button {
+  border: none;
+  padding: 12px 20px;
+  border-radius: 7px;
+  background: #0b4bb3;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.receipt-toolbar button:hover {
+  opacity: 0.9;
+}
+
+.receipt-toolbar .receipt-close {
+  background: #e3262e;
+}
+
+/* =========================
+   RECEIPT SCREEN
+========================= */
+
+.receipt-screen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  overflow: auto;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.receipt-toolbar {
+  width: min(100%, 1100px);
+  margin: 0 auto 15px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.receipt-toolbar button {
+  border: none;
+  padding: 12px 22px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #0866d8;
+  color: white;
+}
+
+.receipt-toolbar .receipt-close {
+  background: #e52323;
+}
+
+/* =========================
+   RECEIPT
+========================= */
+
+.receipt-print-area {
+  position: relative;
+  width: min(100%, 1100px);
+  margin: auto;
+  line-height: 1;
+  background: white;
+}
+
+.receipt-template {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Common text */
+
+.receipt-field {
+  position: absolute;
+  z-index: 5;
+  color: #111;
+  font-family: Arial, sans-serif;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* =========================
+   RECEIPT NUMBER
+========================= */
+
+.receipt-number {
+  left: 17.8%;
+  top: 37.5%;
+  font-size: 25px;
+}
+
+/* =========================
+   DATE
+========================= */
+
+.receipt-date {
+  left: 44.5%;
+  top: 37.5%;
+  width: 18%;
+  text-align: center;
+  font-size: 20px;
+}
+
+/* =========================
+   RECEIVED FROM / NAME
+========================= */
+
+.receipt-name {
+  left: 17%;
+  top: 49.5%;
+  font-size: 22px;
+}
+
+/* =========================
+   CATEGORY
+========================= */
+
+.receipt-category {
+  left: 17%;
+  top: 61.5%;
+  font-size: 21px;
+}
+
+/* =========================
+   DESCRIPTION
+========================= */
+
+.receipt-description {
+  left: 17%;
+  top: 73%;
+  width: 43%;
+  font-size: 19px;
+  white-space: normal;
+}
+
+/* =========================
+   AMOUNT
+========================= */
+
+.receipt-amount-value {
+  left: 17%;
+  top: 85%;
+  font-size: 26px;
+}
+
+/* =========================
+   PRINT
+========================= */
+
+@media print {
+
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .receipt-screen {
+    position: static;
+    background: white;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .receipt-toolbar {
+    display: none;
+  }
+
+  .receipt-print-area {
+    width: 100%;
+    margin: 0;
+  }
+
+  .receipt-template {
+    width: 100%;
+  }
 }

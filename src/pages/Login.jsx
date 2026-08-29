@@ -8,7 +8,6 @@ import {
   FaSignInAlt,
   FaShieldAlt
 } from "react-icons/fa";
-
 import "../App.css";
 import logo from "../assets/logo.png";
 
@@ -29,6 +28,8 @@ function Login() {
 
   return (
     <div className="login-page">
+        
+
       <div className="login-card">
 
         <img src={logo} alt="Logo" className="logo" />

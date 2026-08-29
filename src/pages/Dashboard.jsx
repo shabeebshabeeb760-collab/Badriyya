@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 
+import BackButton from "../components/BackButton";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import DashboardCard from "../components/DashboardCard";
@@ -14,6 +15,7 @@ import {
   FaCalendarDay,
   FaReceipt,
   FaExchangeAlt,
+  FaShoppingCart,
 } from "react-icons/fa";
 
 function Dashboard() {
@@ -73,22 +75,26 @@ function Dashboard() {
         }));
 
         updateDashboard();
+      },
+      (error) => {
+        console.error("Income Error:", error);
       }
     );
-const unsubscribeExpense = onSnapshot(
-  collection(db, "expenses"),
-  (snapshot) => {
-    expenseData = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
 
-    updateDashboard();
-  },
-  (error) => {
-    console.error("Expense Error:", error);
-  }
-);
+    const unsubscribeExpense = onSnapshot(
+      collection(db, "expenses"),
+      (snapshot) => {
+        expenseData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        updateDashboard();
+      },
+      (error) => {
+        console.error("Expense Error:", error);
+      }
+    );
 
     return () => {
       unsubscribeIncome();
@@ -100,6 +106,8 @@ const unsubscribeExpense = onSnapshot(
 
   return (
     <div className="dashboard">
+
+      <BackButton />
 
       <Sidebar
         open={sidebarOpen}
@@ -114,52 +122,67 @@ const unsubscribeExpense = onSnapshot(
 
         <div className="cards">
 
+          {/* TOTAL INCOME */}
           <DashboardCard
             title="Total Income"
-            value={`₹ ${totalIncome}`}
+            value={`₹ ${totalIncome.toLocaleString("en-IN")}`}
             color="#16a34a"
             icon={<FaMoneyBillWave />}
             path="/income"
           />
 
+          {/* TOTAL EXPENSE */}
           <DashboardCard
             title="Total Expense"
-            value={`₹ ${totalExpense}`}
+            value={`₹ ${totalExpense.toLocaleString("en-IN")}`}
             color="#dc2626"
             icon={<FaWallet />}
             path="/expense"
           />
 
+          {/* CURRENT BALANCE */}
           <DashboardCard
             title="Current Balance"
-            value={`₹ ${balance}`}
+            value={`₹ ${balance.toLocaleString("en-IN")}`}
             color="#2563eb"
             icon={<FaChartLine />}
             path="/reports"
           />
 
+          {/* TODAY INCOME */}
           <DashboardCard
             title="Today's Income"
-            value={`₹ ${todayIncome}`}
+            value={`₹ ${todayIncome.toLocaleString("en-IN")}`}
             color="#22c55e"
             icon={<FaCalendarDay />}
             path="/income"
           />
 
+          {/* TODAY EXPENSE */}
           <DashboardCard
             title="Today's Expense"
-            value={`₹ ${todayExpense}`}
+            value={`₹ ${todayExpense.toLocaleString("en-IN")}`}
             color="#f97316"
             icon={<FaReceipt />}
             path="/expense"
           />
 
+          {/* TRANSACTIONS */}
           <DashboardCard
             title="Transactions"
             value={transactions}
             color="#9333ea"
             icon={<FaExchangeAlt />}
             path="/reports"
+          />
+
+          {/* CREDIT PURCHASE */}
+          <DashboardCard
+            title="Credit Purchase"
+            value="Manage"
+            color="#0891b2"
+            icon={<FaShoppingCart />}
+            path="/credit-purchase"
           />
 
         </div>
