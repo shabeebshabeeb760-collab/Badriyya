@@ -1,139 +1,102 @@
-/* ===========================
-   BADRIYYA FINANCE DASHBOARD
-=========================== */
+/* =========================================
+   BADRIYYA FINANCE - DASHBOARD
+========================================= */
 
 .dashboard {
   display: flex;
-
   width: 100%;
   min-height: 100vh;
-
   background: #f4f7fb;
-
   box-sizing: border-box;
 }
 
-
-/* ===========================
+/* =========================================
    MAIN CONTENT
-=========================== */
+========================================= */
 
 .main {
   flex: 1;
-
   min-width: 0;
-
   margin-left: 280px;
-
   padding: 20px;
-
   box-sizing: border-box;
-
   transition: margin-left 0.3s ease;
 }
 
-
-/* ===========================
-   CARDS CONTAINER
-=========================== */
+/* =========================================
+   CARDS
+========================================= */
 
 .cards {
   width: 100%;
-
   display: grid;
-
-  grid-template-columns:
-    repeat(auto-fit, minmax(220px, 1fr));
-
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 20px;
-
   margin-top: 20px;
-
   box-sizing: border-box;
 }
 
-
-/* ===========================
-   DASHBOARD CARD
-=========================== */
+/* =========================================
+   CARD
+========================================= */
 
 .card {
   width: 100%;
-
   min-width: 0;
-
   min-height: 115px;
 
   background: #ffffff;
-
   border-radius: 18px;
-
   padding: 20px;
 
   display: flex;
-
   align-items: center;
-
   gap: 18px;
 
   box-sizing: border-box;
 
-  box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 
   transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 
   cursor: pointer;
 }
 
-
-/* ===========================
-   CARD HOVER
-=========================== */
-
 .card:hover {
-  transform: translateY(-5px);
-
-  box-shadow:
-    0 12px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
 }
 
-
-/* ===========================
+/* =========================================
    CARD ICON
-=========================== */
+========================================= */
 
 .card-icon {
   flex-shrink: 0;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 }
 
-
-/* ===========================
+/* =========================================
    CARD CONTENT
-=========================== */
+========================================= */
 
 .card-content {
   flex: 1;
-
   min-width: 0;
 }
 
 .card-content h3 {
-  margin: 0 0 8px;
+  margin: 0 0 7px;
 
   font-size: 14px;
-
   line-height: 1.3;
 
-  color: #666;
-
+  color: #667085;
   font-weight: 600;
 }
 
@@ -141,66 +104,54 @@
   margin: 0;
 
   font-size: 25px;
-
   line-height: 1.2;
 
   color: #111827;
-
   font-weight: 700;
 
   white-space: nowrap;
-
   overflow: hidden;
-
   text-overflow: ellipsis;
 }
 
-
-/* ===========================
+/* =========================================
    RECENT TRANSACTIONS
-=========================== */
+========================================= */
 
 .recent {
   width: 100%;
 
   margin-top: 30px;
+  padding: 20px;
 
   background: #ffffff;
-
   border-radius: 18px;
-
-  padding: 20px;
 
   box-sizing: border-box;
 
-  box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 
-  overflow: hidden;
+  overflow-x: auto;
 }
 
 .recent h2 {
   margin: 0 0 20px;
 
   font-size: 20px;
-
   color: #0b4bb3;
 }
 
-
-/* ===========================
+/* =========================================
    TABLE
-=========================== */
+========================================= */
 
 table {
   width: 100%;
-
   border-collapse: collapse;
 }
 
 table th {
   background: #0b4bb3;
-
   color: #ffffff;
 
   padding: 14px;
@@ -216,87 +167,73 @@ table td {
   border-bottom: 1px solid #eeeeee;
 
   font-size: 14px;
-
   color: #374151;
 }
 
-
-/* ===========================
+/* =========================================
    TABLET
-=========================== */
+========================================= */
 
-@media (max-width: 1024px) {
+@media (max-width: 1100px) {
 
   .main {
     margin-left: 250px;
-
     padding: 18px;
   }
 
   .cards {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
   }
 
   .card {
     min-height: 110px;
-
     padding: 17px;
-  }
-
-  .card-content h3 {
-    font-size: 14px;
-  }
-
-  .card-content h2 {
-    font-size: 23px;
   }
 }
 
-
-/* ===========================
+/* =========================================
    MOBILE
-=========================== */
+========================================= */
 
 @media (max-width: 768px) {
 
-  /* DASHBOARD */
+  /* FULL SCREEN DASHBOARD */
 
   .dashboard {
     display: block;
-
     width: 100%;
-
     min-height: 100vh;
-
     margin: 0;
-
     padding: 0;
-
-    box-sizing: border-box;
   }
 
+  /* =====================================
+     HIDE SIDEBAR ON MOBILE
+  ===================================== */
 
-  /* MAIN */
+  .sidebar {
+    display: none !important;
+  }
+
+  /* =====================================
+     MAIN FULL WIDTH
+  ===================================== */
 
   .main {
-    width: 100%;
-
-    min-width: 0;
+    width: 100% !important;
+    max-width: 100%;
 
     margin-left: 0 !important;
 
-    padding: 10px 12px 25px;
+    padding: 12px 12px 30px;
 
     box-sizing: border-box;
   }
 
-
-  /* ===========================
-     ONE CARD PER ROW
-  =========================== */
+  /* =====================================
+     CARDS - ONE COLUMN
+  ===================================== */
 
   .cards {
     width: 100%;
@@ -310,10 +247,9 @@ table td {
     margin-top: 14px;
   }
 
-
-  /* ===========================
+  /* =====================================
      MOBILE CARD
-  =========================== */
+  ===================================== */
 
   .card {
     width: 100%;
@@ -323,7 +259,6 @@ table td {
     padding: 18px 20px;
 
     display: flex;
-
     align-items: center;
 
     gap: 18px;
@@ -331,13 +266,7 @@ table td {
     border-radius: 18px;
 
     box-sizing: border-box;
-
-    box-shadow:
-      0 6px 18px rgba(15, 23, 42, 0.08);
   }
-
-
-  /* REMOVE HOVER MOVEMENT ON MOBILE */
 
   .card:hover {
     transform: none;
@@ -346,23 +275,12 @@ table td {
       0 6px 18px rgba(15, 23, 42, 0.08);
   }
 
-
-  /* ===========================
-     CARD ICON
-  =========================== */
-
-  .card-icon {
-    flex-shrink: 0;
-  }
-
-
-  /* ===========================
+  /* =====================================
      CARD CONTENT
-  =========================== */
+  ===================================== */
 
   .card-content {
     flex: 1;
-
     min-width: 0;
   }
 
@@ -370,40 +288,32 @@ table td {
     margin: 0 0 6px;
 
     font-size: 15px;
-
     line-height: 1.3;
 
-    color: #666;
-
-    font-weight: 600;
+    color: #667085;
   }
 
   .card-content h2 {
     margin: 0;
 
     font-size: 25px;
-
     line-height: 1.2;
 
     color: #111827;
 
-    font-weight: 700;
-
     white-space: nowrap;
-
     overflow: visible;
+    text-overflow: clip;
   }
 
-
-  /* ===========================
-     RECENT SECTION
-  =========================== */
+  /* =====================================
+     RECENT
+  ===================================== */
 
   .recent {
     width: 100%;
 
-    margin-top: 20px;
-
+    margin-top: 22px;
     padding: 15px;
 
     border-radius: 16px;
@@ -413,14 +323,12 @@ table td {
 
   .recent h2 {
     margin-bottom: 15px;
-
     font-size: 18px;
   }
 
-
-  /* ===========================
+  /* =====================================
      TABLE
-  =========================== */
+  ===================================== */
 
   table {
     min-width: 600px;
@@ -428,45 +336,31 @@ table td {
 
   table th {
     padding: 12px;
-
     font-size: 13px;
   }
 
   table td {
     padding: 12px;
-
     font-size: 13px;
   }
 }
 
-
-/* ===========================
+/* =========================================
    SMALL MOBILE
-=========================== */
+========================================= */
 
 @media (max-width: 480px) {
 
   .main {
-    padding: 9px 10px 20px;
+    padding: 10px 10px 25px;
   }
 
-
-  /* ONE CARD */
-
   .cards {
-    grid-template-columns: 1fr;
-
     gap: 12px;
-
     margin-top: 12px;
   }
 
-
-  /* CARD */
-
   .card {
-    width: 100%;
-
     min-height: 100px;
 
     padding: 16px 18px;
@@ -476,12 +370,8 @@ table td {
     border-radius: 16px;
   }
 
-
-  /* CARD CONTENT */
-
   .card-content h3 {
-    font-size: 15px;
-
+    font-size: 14px;
     margin-bottom: 6px;
   }
 
@@ -489,12 +379,8 @@ table td {
     font-size: 24px;
   }
 
-
-  /* RECENT */
-
   .recent {
     margin-top: 18px;
-
     padding: 13px;
   }
 
@@ -503,10 +389,9 @@ table td {
   }
 }
 
-
-/* ===========================
+/* =========================================
    VERY SMALL PHONE
-=========================== */
+========================================= */
 
 @media (max-width: 360px) {
 
@@ -529,9 +414,7 @@ table td {
   }
 
   .card-content h3 {
-    font-size: 14px;
-
-    margin-bottom: 5px;
+    font-size: 13px;
   }
 
   .card-content h2 {
