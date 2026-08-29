@@ -3,12 +3,18 @@ import {
   collection,
   addDoc,
   onSnapshot,
-  query,
-  orderBy,
-  serverTimestamp,
+  updateDoc,
+  deleteDoc,
+  doc,
 } from "firebase/firestore";
-import { useParams } from "react-router-dom";
+
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
+
 import { db } from "../firebase/firebase";
+import { useParams } from "react-router-dom";
+
 import BackButton from "../components/BackButton";
 import "./CreditPurchaseCategory.css";
 
@@ -16,44 +22,42 @@ function CreditPurchaseCategory() {
   const { category } = useParams();
 
   const categoryName =
-    category?.charAt(0).toUpperCase() + category?.slice(1);
+    category.charAt(0).toUpperCase() + category.slice(1);
 
   const [records, setRecords] = useState([]);
 
   const [form, setForm] = useState({
     date: "",
     amount: "",
-    type: "cost",
-    description: "",
+    type: "Cost",
   });
 
+  const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  // ===============================
+  // =========================
   // LOAD RECORDS
-  // ===============================
+  // =========================
 
   useEffect(() => {
-    const q = query(
-      collection(db, "creditPurchases"),
-      orderBy("createdAt", "desc")
-    );
-
     const unsubscribe = onSnapshot(
-      q,
+      collection(db, "creditPurchases"),
       (snapshot) => {
-        const data = snapshot.docs
-          .map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
+        const list = snapshot.docs
+          .map((item) => ({
+            id: item.id,
+            ...item.data(),
           }))
           .filter(
             (item) =>
               item.category?.toLowerCase() ===
-              category?.toLowerCase()
+              category.toLowerCase()
+          )
+          .sort((a, b) =>
+            (b.date || "").localeCompare(a.date || "")
           );
 
-        setRecords(data);
+        setRecords(list);
       },
       (error) => {
         console.error("Credit Purchase Error:", error);
@@ -63,9 +67,9 @@ function CreditPurchaseCategory() {
     return () => unsubscribe();
   }, [category]);
 
-  // ===============================
-  // INPUT CHANGE
-  // ===============================
+  // =========================
+  // HANDLE CHANGE
+  // =========================
 
   const handleChange = (e) => {
     setForm({
@@ -74,9 +78,9 @@ function CreditPurchaseCategory() {
     });
   };
 
-  // ===============================
-  // SAVE
-  // ===============================
+  // =========================
+  // SAVE / UPDATE
+  // =========================
 
   const saveRecord = async (e) => {
     e.preventDefault();
@@ -91,133 +95,376 @@ function CreditPurchaseCategory() {
     setSaving(true);
 
     try {
-      await addDoc(collection(db, "creditPurchases"), {
+      const data = {
         category: categoryName,
         date: form.date,
         amount: Number(form.amount),
         type: form.type,
-        description: form.description,
-        createdAt: serverTimestamp(),
-      });
+      };
 
-      setForm({
-        date: "",
-        amount: "",
-        type: "cost",
-        description: "",
-      });
+      if (editingId) {
+        await updateDoc(
+          doc(db, "creditPurchases", editingId),
+          data
+        );
 
-      alert("Saved Successfully");
+        alert("Record Updated Successfully");
+      } else {
+        await addDoc(
+          collection(db, "creditPurchases"),
+          {
+            ...data,
+            createdAt: new Date(),
+          }
+        );
+
+        alert("Record Saved Successfully");
+      }
+
+      resetForm();
+
     } catch (error) {
       console.error(error);
-      alert("Error saving record");
+      alert("Error Saving Record");
     } finally {
       setSaving(false);
     }
   };
 
-  // ===============================
-  // TOTALS
-  // ===============================
+  // =========================
+  // EDIT
+  // =========================
 
-  const totalIncome = records
-    .filter((item) => item.type === "income")
-    .reduce(
-      (total, item) => total + Number(item.amount || 0),
-      0
+  const startEdit = (item) => {
+    setEditingId(item.id);
+
+    setForm({
+      date: item.date || "",
+      amount: item.amount || "",
+      type: item.type || "Cost",
+    });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  // =========================
+  // DELETE
+  // =========================
+
+  const deleteRecord = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this record?"
     );
 
-  const totalCost = records
-    .filter((item) => item.type === "cost")
-    .reduce(
-      (total, item) => total + Number(item.amount || 0),
-      0
+    if (!confirmDelete) return;
+
+    try {
+      await deleteDoc(
+        doc(db, "creditPurchases", id)
+      );
+
+      alert("Record Deleted Successfully");
+
+    } catch (error) {
+      console.error(error);
+      alert("Error Deleting Record");
+    }
+  };
+
+  // =========================
+  // RESET FORM
+  // =========================
+
+  const resetForm = () => {
+    setEditingId(null);
+
+    setForm({
+      date: "",
+      amount: "",
+      type: "Cost",
+    });
+  };
+
+  // =========================
+  // TOTAL COST
+  // =========================
+
+  const totalCost = records.reduce(
+    (total, item) => {
+      if (item.type === "Cost") {
+        return total + Number(item.amount || 0);
+      }
+
+      return total;
+    },
+    0
+  );
+
+  // =========================
+  // TOTAL INCOME
+  // =========================
+
+  const totalIncome = records.reduce(
+    (total, item) => {
+      if (item.type === "Income") {
+        return total + Number(item.amount || 0);
+      }
+
+      return total;
+    },
+    0
+  );
+
+  // =========================
+  // PENDING BALANCE
+  // =========================
+
+  const pendingBalance =
+    totalCost - totalIncome;
+
+  // =========================
+  // DOWNLOAD PDF
+  // =========================
+
+  const downloadPDF = () => {
+    if (records.length === 0) {
+      alert("No records available");
+      return;
+    }
+
+    const pdf = new jsPDF();
+
+    pdf.setFontSize(18);
+
+    pdf.text(
+      `${categoryName} Credit Purchase Report`,
+      14,
+      20
     );
 
-  const pendingBalance = totalCost - totalIncome;
+    pdf.setFontSize(11);
 
-  const money = (amount) =>
-    `₹ ${Number(amount || 0).toLocaleString("en-IN")}`;
+    pdf.text(
+      `Total Cost: Rs. ${totalCost.toLocaleString(
+        "en-IN"
+      )}`,
+      14,
+      30
+    );
 
-  // ===============================
-  // RETURN
-  // ===============================
+    pdf.text(
+      `Total Income: Rs. ${totalIncome.toLocaleString(
+        "en-IN"
+      )}`,
+      14,
+      37
+    );
+
+    pdf.text(
+      `Pending Balance: Rs. ${pendingBalance.toLocaleString(
+        "en-IN"
+      )}`,
+      14,
+      44
+    );
+
+    autoTable(pdf, {
+      startY: 52,
+
+      head: [
+        [
+          "Date",
+          "Amount",
+          "Type",
+        ],
+      ],
+
+      body: records.map((item) => [
+        item.date || "-",
+
+        `Rs. ${Number(
+          item.amount || 0
+        ).toLocaleString("en-IN")}`,
+
+        item.type || "-",
+      ]),
+
+      styles: {
+        fontSize: 10,
+      },
+
+      headStyles: {
+        fillColor: [23, 32, 51],
+      },
+    });
+
+    pdf.save(
+      `${categoryName}-Credit-Purchase-Report.pdf`
+    );
+  };
+
+  // =========================
+  // DOWNLOAD EXCEL
+  // =========================
+
+  const downloadExcel = () => {
+    if (records.length === 0) {
+      alert("No records available");
+      return;
+    }
+
+    const data = records.map((item) => ({
+      Date: item.date || "",
+      Category: item.category || "",
+      Amount: Number(item.amount || 0),
+      Type: item.type || "",
+    }));
+
+    data.push({
+      Date: "",
+      Category: "",
+      Amount: "",
+      Type: "",
+    });
+
+    data.push({
+      Date: "Total Cost",
+      Category: "",
+      Amount: totalCost,
+      Type: "",
+    });
+
+    data.push({
+      Date: "Total Income",
+      Category: "",
+      Amount: totalIncome,
+      Type: "",
+    });
+
+    data.push({
+      Date: "Pending Balance",
+      Category: "",
+      Amount: pendingBalance,
+      Type: "",
+    });
+
+    const worksheet =
+      XLSX.utils.json_to_sheet(data);
+
+    const workbook =
+      XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      categoryName.substring(0, 31)
+    );
+
+    XLSX.writeFile(
+      workbook,
+      `${categoryName}-Credit-Purchase-Report.xlsx`
+    );
+  };
 
   return (
     <div className="credit-category-page">
+
+      {/* BACK */}
 
       <BackButton />
 
       {/* HEADER */}
 
-      <div className="credit-header">
+      <div className="category-header">
 
         <div>
-          <h1>{categoryName}</h1>
-          <p>Credit Purchase Records</p>
+          <h2>{categoryName}</h2>
+
+          <p>
+            Credit Purchase Records
+          </p>
+        </div>
+
+        <div className="category-pending">
+
+          <span>
+            Pending Balance
+          </span>
+
+          <strong>
+            ₹{" "}
+            {pendingBalance.toLocaleString(
+              "en-IN"
+            )}
+          </strong>
+
         </div>
 
       </div>
 
-      {/* SUMMARY CARDS */}
+      {/* SUMMARY */}
 
-      <div className="credit-summary">
-
-        {/* TOTAL INCOME */}
-
-        <div className="summary-card income-card">
-
-          <div className="summary-icon">
-            ₹
-          </div>
-
-          <div>
-            <span>Total Income</span>
-            <h2>{money(totalIncome)}</h2>
-          </div>
-
-        </div>
-
-        {/* TOTAL COST */}
+      <div className="summary-cards">
 
         <div className="summary-card cost-card">
 
-          <div className="summary-icon">
-            ₹
-          </div>
+          <span>
+            Total Cost
+          </span>
 
-          <div>
-            <span>Total Cost</span>
-            <h2>{money(totalCost)}</h2>
-          </div>
+          <strong>
+            ₹{" "}
+            {totalCost.toLocaleString(
+              "en-IN"
+            )}
+          </strong>
 
         </div>
 
-        {/* PENDING */}
+        <div className="summary-card income-card">
+
+          <span>
+            Total Income
+          </span>
+
+          <strong>
+            ₹{" "}
+            {totalIncome.toLocaleString(
+              "en-IN"
+            )}
+          </strong>
+
+        </div>
 
         <div className="summary-card pending-card">
 
-          <div className="summary-icon">
-            ₹
-          </div>
+          <span>
+            Pending Balance
+          </span>
 
-          <div>
-            <span>Pending Balance</span>
-            <h2>{money(pendingBalance)}</h2>
-          </div>
+          <strong>
+            ₹{" "}
+            {pendingBalance.toLocaleString(
+              "en-IN"
+            )}
+          </strong>
 
         </div>
 
       </div>
 
-      {/* ADD RECORD */}
+      {/* FORM */}
 
       <div className="credit-form-card">
 
-        <div className="form-title">
-          <h2>Add {categoryName}</h2>
-          <p>Enter income or cost details</p>
-        </div>
+        <h3>
+          {editingId
+            ? `Edit ${categoryName}`
+            : `Add ${categoryName}`}
+        </h3>
 
         <form onSubmit={saveRecord}>
 
@@ -225,9 +472,11 @@ function CreditPurchaseCategory() {
 
             {/* DATE */}
 
-            <div className="form-group">
+            <div>
 
-              <label>Date</label>
+              <label>
+                Date
+              </label>
 
               <input
                 type="date"
@@ -241,17 +490,19 @@ function CreditPurchaseCategory() {
 
             {/* AMOUNT */}
 
-            <div className="form-group">
+            <div>
 
-              <label>Amount</label>
+              <label>
+                Amount
+              </label>
 
               <input
                 type="number"
                 name="amount"
-                placeholder="Enter amount"
+                placeholder="Amount"
+                min="1"
                 value={form.amount}
                 onChange={handleChange}
-                min="1"
                 required
               />
 
@@ -259,51 +510,59 @@ function CreditPurchaseCategory() {
 
             {/* TYPE */}
 
-            <div className="form-group">
+            <div>
 
-              <label>Type</label>
+              <label>
+                Type
+              </label>
 
               <select
                 name="type"
                 value={form.type}
                 onChange={handleChange}
               >
-                <option value="cost">
+
+                <option value="Cost">
                   Cost
                 </option>
 
-                <option value="income">
+                <option value="Income">
                   Income
                 </option>
+
               </select>
-
-            </div>
-
-            {/* DESCRIPTION */}
-
-            <div className="form-group">
-
-              <label>Description</label>
-
-              <input
-                type="text"
-                name="description"
-                placeholder="Optional description"
-                value={form.description}
-                onChange={handleChange}
-              />
 
             </div>
 
           </div>
 
-          <button
-            type="submit"
-            className="save-credit-btn"
-            disabled={saving}
-          >
-            {saving ? "Saving..." : "＋ Save Record"}
-          </button>
+          <div className="form-buttons">
+
+            <button
+              type="submit"
+              className="save-credit-btn"
+              disabled={saving}
+            >
+              {saving
+                ? "Saving..."
+                : editingId
+                ? "Update"
+                : "Save"}
+            </button>
+
+            {editingId && (
+
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={resetForm}
+              >
+                Cancel
+              </button>
+
+            )}
+
+          </div>
 
         </form>
 
@@ -311,97 +570,159 @@ function CreditPurchaseCategory() {
 
       {/* RECORDS */}
 
-      <div className="credit-records">
+      <div className="credit-records-card">
 
         <div className="records-header">
 
           <div>
-            <h2>Records</h2>
-            <p>{records.length} transactions</p>
+
+            <h3>
+              {categoryName} Records
+            </h3>
+
+            <p>
+              {records.length} record
+              {records.length !== 1
+                ? "s"
+                : ""}
+            </p>
+
+          </div>
+
+          <div className="download-buttons">
+
+            <button
+              className="pdf-btn"
+              onClick={downloadPDF}
+            >
+              📄 PDF
+            </button>
+
+            <button
+              className="excel-btn"
+              onClick={downloadExcel}
+            >
+              📊 Excel
+            </button>
+
           </div>
 
         </div>
 
-        {records.length === 0 ? (
+        {/* TABLE */}
 
-          <div className="empty-records">
-            <div>📋</div>
-            <h3>No Records Yet</h3>
-            <p>
-              Add your first {categoryName} record above.
-            </p>
-          </div>
+        <div className="table-wrapper">
 
-        ) : (
+          <table>
 
-          <div className="table-wrapper">
+            <thead>
 
-            <table>
+              <tr>
 
-              <thead>
+                <th>
+                  Date
+                </th>
+
+                <th>
+                  Amount
+                </th>
+
+                <th>
+                  Type
+                </th>
+
+                <th>
+                  Action
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {records.length === 0 ? (
+
                 <tr>
-                  <th>Date</th>
-                  <th>Type</th>
-                  <th>Description</th>
-                  <th>Amount</th>
+
+                  <td
+                    colSpan="4"
+                    className="no-records"
+                  >
+                    No records found
+                  </td>
+
                 </tr>
-              </thead>
 
-              <tbody>
+              ) : (
 
-                {records.map((item) => (
+                records.map((item) => (
 
                   <tr key={item.id}>
 
                     <td>
-                      {item.date
-                        ? new Date(
-                            item.date + "T00:00:00"
-                          ).toLocaleDateString("en-IN")
-                        : "-"}
+                      {item.date}
+                    </td>
+
+                    <td>
+                      ₹{" "}
+                      {Number(
+                        item.amount || 0
+                      ).toLocaleString(
+                        "en-IN"
+                      )}
                     </td>
 
                     <td>
 
                       <span
                         className={
-                          item.type === "income"
-                            ? "type-badge income"
-                            : "type-badge cost"
+                          item.type ===
+                          "Cost"
+                            ? "cost"
+                            : "income"
                         }
                       >
-                        {item.type === "income"
-                          ? "Income"
-                          : "Cost"}
+                        {item.type}
                       </span>
 
                     </td>
 
                     <td>
-                      {item.description || "-"}
-                    </td>
 
-                    <td
-                      className={
-                        item.type === "income"
-                          ? "amount-income"
-                          : "amount-cost"
-                      }
-                    >
-                      {money(item.amount)}
+                      <button
+                        className="edit-btn"
+                        onClick={() =>
+                          startEdit(item)
+                        }
+                      >
+                        ✏️ Edit
+                      </button>
+
+                      <button
+                        className="delete-btn"
+                        onClick={() =>
+                          deleteRecord(
+                            item.id
+                          )
+                        }
+                      >
+                        🗑 Delete
+                      </button>
+
                     </td>
 
                   </tr>
 
-                ))}
+                ))
 
-              </tbody>
+              )}
 
-            </table>
+            </tbody>
 
-          </div>
+          </table>
 
-        )}
+        </div>
 
       </div>
 
