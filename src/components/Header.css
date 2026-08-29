@@ -5,6 +5,7 @@
 .header {
   width: 100%;
   min-height: 78px;
+
   background: #ffffff;
 
   border: 1px solid #e8edf5;
@@ -14,49 +15,20 @@
 
   display: flex;
   align-items: center;
+
   gap: 20px;
 
   box-sizing: border-box;
 
-  box-shadow: 0 5px 18px rgba(15, 23, 42, 0.06);
+  box-shadow:
+    0 5px 18px rgba(15, 23, 42, 0.06);
 
   margin-bottom: 22px;
 }
 
-/* ===========================
-   MENU BUTTON
-=========================== */
-
-.menu-btn {
-  width: 44px;
-  height: 44px;
-
-  min-width: 44px;
-
-  border: none;
-  border-radius: 10px;
-
-  background: #0b4bb3;
-  color: #ffffff;
-
-  display: none;
-
-  align-items: center;
-  justify-content: center;
-
-  font-size: 19px;
-
-  cursor: pointer;
-
-  transition: 0.2s ease;
-}
-
-.menu-btn:hover {
-  background: #083b91;
-}
 
 /* ===========================
-   LEFT
+   LEFT / TITLE
 =========================== */
 
 .header-left {
@@ -85,6 +57,7 @@
   font-size: 13px;
 }
 
+
 /* ===========================
    SEARCH
 =========================== */
@@ -93,7 +66,10 @@
   flex: 1;
 
   display: flex;
+
   justify-content: center;
+
+  min-width: 0;
 }
 
 .header-search input {
@@ -103,6 +79,7 @@
   height: 44px;
 
   border: 1px solid #dbe2ea;
+
   border-radius: 10px;
 
   padding: 0 16px;
@@ -129,18 +106,21 @@
     0 0 0 3px rgba(11, 75, 179, 0.08);
 }
 
+
 /* ===========================
    RIGHT
 =========================== */
 
 .header-right {
   display: flex;
+
   align-items: center;
 
-  gap: 18px;
+  gap: 12px;
 
   margin-left: auto;
 }
+
 
 /* ===========================
    NOTIFICATION
@@ -149,14 +129,17 @@
 .notification {
   position: relative;
 
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
 
-  border-radius: 10px;
+  border-radius: 11px;
 
   cursor: pointer;
 
@@ -169,14 +152,15 @@
 
 .notification svg {
   font-size: 22px;
+
   color: #0b4bb3;
 }
 
 .notification span {
   position: absolute;
 
-  top: 2px;
-  right: 1px;
+  top: 1px;
+  right: 0;
 
   width: 18px;
   height: 18px;
@@ -184,17 +168,21 @@
   border-radius: 50%;
 
   background: #ef4444;
+
   color: #ffffff;
 
   font-size: 10px;
+
   font-weight: 700;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
 
   border: 2px solid #ffffff;
 }
+
 
 /* ===========================
    ADMIN
@@ -202,16 +190,20 @@
 
 .admin {
   display: flex;
+
   align-items: center;
 
   gap: 9px;
 
-  padding-left: 8px;
+  padding-left: 6px;
 }
 
 .admin-icon {
   font-size: 40px;
+
   color: #0b4bb3;
+
+  flex-shrink: 0;
 }
 
 .admin h4 {
@@ -220,6 +212,7 @@
   color: #1e293b;
 
   font-size: 15px;
+
   font-weight: 700;
 }
 
@@ -231,11 +224,22 @@
   font-size: 11px;
 }
 
+
 /* ===========================
    TABLET
 =========================== */
 
-@media (max-width: 1000px) {
+@media (max-width: 1024px) {
+
+  .header {
+    padding: 13px 18px;
+
+    gap: 15px;
+  }
+
+  .header-left {
+    min-width: 180px;
+  }
 
   .header-left h1 {
     font-size: 24px;
@@ -250,6 +254,7 @@
   }
 }
 
+
 /* ===========================
    MOBILE
 =========================== */
@@ -257,67 +262,91 @@
 @media (max-width: 768px) {
 
   .header {
-    min-height: 62px;
+    width: 100%;
 
-    padding: 9px 12px;
+    min-height: 64px;
+
+    padding: 9px 10px;
 
     border-radius: 12px;
 
-    gap: 10px;
+    gap: 8px;
 
-    margin-bottom: 15px;
+    margin-bottom: 14px;
+
+    box-shadow:
+      0 4px 14px rgba(15, 23, 42, 0.06);
   }
 
-  /* MENU */
 
-  .menu-btn {
-    display: flex;
-  }
-
-  /* TITLE */
+  /* ===========================
+     TITLE
+  =========================== */
 
   .header-left {
-    min-width: 0;
     flex: 1;
+
+    min-width: 0;
+
+    overflow: hidden;
   }
 
   .header-left h1 {
-    font-size: 19px;
+    font-size: 18px;
+
+    line-height: 1.2;
 
     white-space: nowrap;
+
     overflow: hidden;
+
     text-overflow: ellipsis;
   }
 
   .header-left p {
-    font-size: 10px;
-
     margin-top: 2px;
 
+    font-size: 9px;
+
     white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
   }
 
-  /* SEARCH */
+
+  /* ===========================
+     SEARCH HIDDEN
+  =========================== */
 
   .header-search {
-    order: 3;
-
-    flex-basis: 100%;
-    width: 100%;
-
-    display: none;
+    display: none !important;
   }
 
-  /* RIGHT */
+
+  /* ===========================
+     RIGHT
+  =========================== */
 
   .header-right {
-    gap: 5px;
+    gap: 3px;
+
     margin-left: 0;
+
+    flex-shrink: 0;
   }
+
+
+  /* ===========================
+     NOTIFICATION
+  =========================== */
 
   .notification {
     width: 38px;
     height: 38px;
+
+    border-radius: 9px;
   }
 
   .notification svg {
@@ -329,22 +358,32 @@
     height: 16px;
 
     font-size: 9px;
+
+    top: 0;
+    right: 0;
   }
 
-  /* ADMIN */
+
+  /* ===========================
+     ADMIN
+  =========================== */
 
   .admin {
     padding-left: 0;
+
+    gap: 0;
   }
 
   .admin-icon {
-    font-size: 36px;
+    font-size: 35px;
   }
 
-  .admin h4 {
+  .admin h4,
+  .admin p {
     display: none;
   }
 }
+
 
 /* ===========================
    SMALL MOBILE
@@ -353,32 +392,38 @@
 @media (max-width: 400px) {
 
   .header {
-    padding: 8px 10px;
-  }
+    min-height: 60px;
 
-  .menu-btn {
-    width: 40px;
-    height: 40px;
+    padding: 8px;
 
-    min-width: 40px;
-
-    font-size: 17px;
+    gap: 6px;
   }
 
   .header-left h1 {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .header-left p {
-    font-size: 9px;
-  }
-
-  .admin-icon {
-    font-size: 32px;
+    font-size: 8px;
   }
 
   .notification {
     width: 34px;
     height: 34px;
+  }
+
+  .notification svg {
+    font-size: 18px;
+  }
+
+  .notification span {
+    width: 15px;
+    height: 15px;
+
+    font-size: 8px;
+  }
+
+  .admin-icon {
+    font-size: 31px;
   }
 }

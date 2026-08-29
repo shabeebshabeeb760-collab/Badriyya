@@ -24,4 +24,4 @@ export const downloadReport = (reports, income, expense) => {
   });
 
   doc.save("Finance_Report.pdf");
-};
+}; 

@@ -50,3 +50,18 @@
 .expense-card button:hover{
     background:#b71c1c;
 }
+.back-btn{
+    background:#0B4BB3;
+    color:#fff;
+    border:none;
+    padding:10px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-bottom:20px;
+    font-size:15px;
+    font-weight:600;
+}
+
+.back-btn:hover{
+    background:#083a8a;
+}
