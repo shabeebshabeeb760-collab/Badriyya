@@ -9,6 +9,7 @@ import Settings from "./pages/Settings";
 import CreditPurchase from "./pages/CreditPurchase";
 import CreditPurchaseCategory from "./pages/CreditPurchaseCategory";
 import Receipt from "./pages/Receipt";
+import CalendarSalesDashboard from "./pages/CalendarSalesDashboard";
 function App() {
   return (
     <Routes>
@@ -23,6 +24,10 @@ function App() {
   element={<CreditPurchase />}
 />
 
+<Route
+  path="/calendar-sales-dashboard"
+  element={<CalendarSalesDashboard />}
+/>
 <Route
   path="/credit-purchase/:category"
   element={<CreditPurchaseCategory />}

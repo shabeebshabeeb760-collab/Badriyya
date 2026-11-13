@@ -187,7 +187,13 @@ function Dashboard() {
             icon={<FaShoppingCart />}
             path="/credit-purchase"
           />
-
+          <DashboardCard
+  title="Calendar Sales"
+  value="View Dashboard"
+  color="#2563eb"
+  icon="📅"
+  path="/calendar-sales-dashboard"
+/>
         </div>
 
         {/* RECENT TRANSACTIONS */}
