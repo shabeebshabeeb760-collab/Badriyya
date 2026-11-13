@@ -112,12 +112,44 @@ function CalendarSales() {
     (total, entry) => total + Number(entry.quantity || 0),
     0
   );
+  const totalRecordedSales = records.reduce(
+    (total, entry) => total + Number(entry.amount || 0),
+    0
+  );
+
+  const salesmanTotals = Object.values(
+    records.reduce((summary, entry) => {
+      const name = (entry.salesmanName || "Unknown").trim() || "Unknown";
+      const amount = Number(entry.amount || 0);
+      const cash = Number(entry.cashReceived || 0);
+      const gpay = Number(entry.gpayReceived || 0);
+
+      if (!summary[name]) {
+        summary[name] = {
+          name,
+          sales: 0,
+          quantity: 0,
+          cash: 0,
+          gpay: 0,
+          pending: 0,
+          entries: 0,
+        };
+      }
+
+      summary[name].sales += amount;
+      summary[name].quantity += Number(entry.quantity || 0);
+      summary[name].cash += cash;
+      summary[name].gpay += gpay;
+      summary[name].pending += Math.max(amount - cash - gpay, 0);
+      summary[name].entries += 1;
+      return summary;
+    }, {})
+  ).sort((a, b) => b.sales - a.sales);
 
   const salesmanChartData = Object.entries(
     records.reduce((summary, entry) => {
       const name = (entry.salesmanName || "Unknown").trim() || "Unknown";
-      const total = Number(entry.totalCollected || entry.amount || 0);
-      summary[name] = (summary[name] || 0) + total;
+      summary[name] = (summary[name] || 0) + Number(entry.amount || 0);
       return summary;
     }, {})
   )
@@ -135,7 +167,7 @@ function CalendarSales() {
       .filter((entry) => entry.date === today())
       .reduce((summary, entry) => {
         const name = (entry.salesmanName || "Unknown").trim() || "Unknown";
-        const total = Number(entry.totalCollected || entry.amount || 0);
+        const total = Number(entry.amount || 0);
         summary[name] = (summary[name] || 0) + total;
         return summary;
       }, {})
@@ -206,6 +238,59 @@ function CalendarSales() {
     });
 
     pdf.save("badriyya-calendar-sales-report.pdf");
+  };
+
+  const downloadSalesmanReport = () => {
+    if (!salesmanTotals.length) {
+      setMessage("No sales records available for the salesman report.");
+      setMessageType("error");
+      return;
+    }
+
+    const pdf = new jsPDF({ orientation: "landscape" });
+    pdf.setFontSize(18);
+    pdf.text("BADRIYYA Salesman-wise Sales Report", 14, 18);
+    pdf.setFontSize(10);
+    pdf.text(`Generated: ${new Date().toLocaleDateString("en-IN")}`, 14, 25);
+    pdf.text(`Total Sales: ${money(totalRecordedSales)}`, 14, 32);
+    pdf.text(`Total Quantity: ${totalRecordedQuantity.toLocaleString("en-IN")}`, 120, 32);
+
+    autoTable(pdf, {
+      startY: 39,
+      head: [[
+        "Salesman",
+        "Entries",
+        "Quantity",
+        "Total Sale",
+        "Cash",
+        "GPay",
+        "Pending",
+      ]],
+      body: salesmanTotals.map((item) => [
+        item.name,
+        String(item.entries),
+        item.quantity.toLocaleString("en-IN"),
+        money(item.sales),
+        money(item.cash),
+        money(item.gpay),
+        money(item.pending),
+      ]),
+      foot: [[
+        "Grand Total",
+        String(records.length),
+        totalRecordedQuantity.toLocaleString("en-IN"),
+        money(totalRecordedSales),
+        money(totalRecordedCash),
+        money(totalRecordedGpay),
+        money(salesmanTotals.reduce((total, item) => total + item.pending, 0)),
+      ]],
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [37, 99, 235] },
+      footStyles: { fillColor: [5, 150, 105], fontStyle: "bold" },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+    });
+
+    pdf.save("badriyya-salesman-total-sales-report.pdf");
   };
 
   const updateField = (event) => {
@@ -800,6 +885,81 @@ function CalendarSales() {
             )}
           </div>
         </div>
+      </section>
+
+      <section className="premium-record-panel">
+        <div className="premium-record-header">
+          <div>
+            <span className="eyebrow record-eyebrow">SALESMAN REPORT</span>
+            <h2>Total Sales by Salesman</h2>
+          </div>
+          <div className="premium-record-actions">
+            <span className="record-count">{salesmanTotals.length} salesmen</span>
+            <button
+              type="button"
+              className="premium-download-button"
+              onClick={downloadSalesmanReport}
+              disabled={!salesmanTotals.length}
+            >
+              Download Sales Report PDF
+            </button>
+          </div>
+        </div>
+
+        {loadingRecords ? (
+          <div className="premium-record-loading">Loading salesman report...</div>
+        ) : salesmanTotals.length === 0 ? (
+          <div className="premium-record-empty">
+            No sales records available for the salesman report.
+          </div>
+        ) : (
+          <div className="premium-record-table-wrap">
+            <table className="premium-record-table salesman-report-table">
+              <thead>
+                <tr>
+                  <th>Salesman</th>
+                  <th>Entries</th>
+                  <th>Total Quantity</th>
+                  <th>Total Sale</th>
+                  <th>Total Cash</th>
+                  <th>Total GPay</th>
+                  <th>Total Pending</th>
+                </tr>
+              </thead>
+              <tbody>
+                {salesmanTotals.map((item) => (
+                  <tr key={item.name}>
+                    <td>{item.name}</td>
+                    <td>{item.entries}</td>
+                    <td>{item.quantity.toLocaleString("en-IN")}</td>
+                    <td>{money(item.sales)}</td>
+                    <td>{money(item.cash)}</td>
+                    <td>{money(item.gpay)}</td>
+                    <td>{money(item.pending)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th>Grand Total</th>
+                  <th>{records.length}</th>
+                  <th>{totalRecordedQuantity.toLocaleString("en-IN")}</th>
+                  <th>{money(totalRecordedSales)}</th>
+                  <th>{money(totalRecordedCash)}</th>
+                  <th>{money(totalRecordedGpay)}</th>
+                  <th>
+                    {money(
+                      salesmanTotals.reduce(
+                        (total, item) => total + item.pending,
+                        0
+                      )
+                    )}
+                  </th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        )}
       </section>
 
       <section className="premium-record-panel">
