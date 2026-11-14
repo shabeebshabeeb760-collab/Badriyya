@@ -12,8 +12,6 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { db } from "../firebase/firebase";
 import "./CalendarSalesDashboard.css";
 
@@ -60,8 +58,9 @@ function CalendarSales() {
   const [saving, setSaving] = useState(false);
   const [records, setRecords] = useState([]);
   const [loadingRecords, setLoadingRecords] = useState(true);
+  const [downloadingReport, setDownloadingReport] = useState(false);
+  const [reportDate, setReportDate] = useState("");
   const [editingId, setEditingId] = useState(null);
-  const [shareMessage, setShareMessage] = useState("");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("error");
 
@@ -116,52 +115,17 @@ function CalendarSales() {
     (total, entry) => total + Number(entry.amount || 0),
     0
   );
-
-  const salesmanTotals = Object.values(
-    records.reduce((summary, entry) => {
-      const name = (entry.salesmanName || "Unknown").trim() || "Unknown";
-      const amount = Number(entry.amount || 0);
-      const cash = Number(entry.cashReceived || 0);
-      const gpay = Number(entry.gpayReceived || 0);
-
-      if (!summary[name]) {
-        summary[name] = {
-          name,
-          sales: 0,
-          quantity: 0,
-          cash: 0,
-          gpay: 0,
-          pending: 0,
-          entries: 0,
-        };
-      }
-
-      summary[name].sales += amount;
-      summary[name].quantity += Number(entry.quantity || 0);
-      summary[name].cash += cash;
-      summary[name].gpay += gpay;
-      summary[name].pending += Math.max(amount - cash - gpay, 0);
-      summary[name].entries += 1;
-      return summary;
-    }, {})
-  ).sort((a, b) => b.sales - a.sales);
-
-  const salesmanChartData = Object.entries(
-    records.reduce((summary, entry) => {
-      const name = (entry.salesmanName || "Unknown").trim() || "Unknown";
-      summary[name] = (summary[name] || 0) + Number(entry.amount || 0);
-      return summary;
-    }, {})
-  )
-    .map(([name, total]) => ({ name, total }))
-    .sort((a, b) => b.total - a.total)
-    .slice(0, 5);
-
-  const maxChartValue = Math.max(
-    ...salesmanChartData.map((item) => item.total),
-    1
+  const totalRecordedPending = records.reduce(
+    (total, entry) =>
+      total +
+      Math.max(
+        Number(entry.amount || 0) -
+          Number(entry.cashReceived || 0) -
+          Number(entry.gpayReceived || 0),
+        0
+      ),
+    0
   );
-
   const todayTopSalesman = Object.entries(
     records
       .filter((entry) => entry.date === today())
@@ -175,122 +139,245 @@ function CalendarSales() {
     .map(([name, total]) => ({ name, total }))
     .sort((a, b) => b.total - a.total)[0];
 
-  const paymentRecords = records
-    .filter(
-      (entry) =>
-        Number(entry.cashReceived || 0) > 0 ||
-        Number(entry.gpayReceived || 0) > 0
-    )
-    .slice(0, 6);
-
-  const downloadPDF = () => {
-    if (!records.length) {
-      setMessage("No sales records available to download.");
+  const downloadPDF = async (dateFilter = "") => {
+    const reportRecords = dateFilter
+      ? records.filter((entry) => entry.date === dateFilter)
+      : records;
+    if (!reportRecords.length) {
+      setMessage(
+        dateFilter
+          ? "No sales records found for the selected date."
+          : "No sales records available to download."
+      );
       setMessageType("error");
       return;
     }
 
-    const pdf = new jsPDF();
-    pdf.setFontSize(18);
-    pdf.text("BADRIYYA Calendar Sales Report", 14, 20);
+    try {
+      setDownloadingReport(true);
+      setMessage("");
+      const reportTotals = reportRecords.reduce(
+        (totals, entry) => {
+          const amount = Number(entry.amount || 0);
+          const cashAmount = Number(entry.cashReceived || 0);
+          const gpayAmount = Number(entry.gpayReceived || 0);
+          totals.sales += amount;
+          totals.cash += cashAmount;
+          totals.gpay += gpayAmount;
+          totals.quantity += Number(entry.quantity || 0);
+          totals.pending += Math.max(amount - cashAmount - gpayAmount, 0);
+          const salesman = (entry.salesmanName || "Unknown").trim() || "Unknown";
+          totals.salesBySalesman[salesman] =
+            (totals.salesBySalesman[salesman] || 0) + amount;
+          return totals;
+        },
+        { sales: 0, cash: 0, gpay: 0, quantity: 0, pending: 0, salesBySalesman: {} }
+      );
+      const reportTopSalesman = Object.entries(reportTotals.salesBySalesman).sort(
+        (a, b) => b[1] - a[1]
+      )[0];
+      const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+        import("jspdf"),
+        import("jspdf-autotable"),
+      ]);
 
-    pdf.setFontSize(11);
-    pdf.text(
-      `Top Salesman: ${
-        salesmanChartData[0]
-          ? `${salesmanChartData[0].name} - ${money(salesmanChartData[0].total)}`
-          : "N/A"
-      }`,
-      14,
-      32
-    );
-    pdf.text(
-      `Today Top Salesman: ${
-        todayTopSalesman ? `${todayTopSalesman.name} - ${money(todayTopSalesman.total)}` : "N/A"
-      }`,
-      14,
-      40
-    );
-    pdf.text(`Total Cash: ${money(totalRecordedCash)}`, 14, 48);
-    pdf.text(`Total GPay: ${money(totalRecordedGpay)}`, 14, 56);
-    pdf.text(
-      `Total Calendar Quantity: ${totalRecordedQuantity.toLocaleString("en-IN")}`,
-      14,
-      64
-    );
+      const pdf = new jsPDF({ orientation: "landscape" });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const margin = 14;
+      const generatedDate = new Date().toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      });
+      const reportDateLabel = dateFilter
+        ? new Date(`${dateFilter}T12:00:00`).toLocaleDateString("en-IN", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          })
+        : "";
 
-    autoTable(pdf, {
-      startY: 72,
-      head: [["Salesman", "Place", "Date", "Qty", "Amount", "Cash", "GPay", "Pending"]],
-      body: records.map((entry) => [
-        entry.salesmanName || "-",
-        entry.place || "-",
-        entry.date || "-",
-        Number(entry.quantity || 0).toLocaleString("en-IN"),
-        money(entry.amount || 0),
-        money(entry.cashReceived || 0),
-        money(entry.gpayReceived || 0),
-        money(entry.pending || 0),
-      ]),
-      styles: { fontSize: 9 },
-      headStyles: { fillColor: [37, 99, 235] },
-      alternateRowStyles: { fillColor: [248, 250, 252] },
-    });
+      pdf.setFillColor(23, 58, 53);
+      pdf.rect(0, 0, pageWidth, 39, "F");
+      pdf.setFillColor(201, 154, 69);
+      pdf.rect(0, 39, pageWidth, 2, "F");
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(20);
+      pdf.text("BADRIYYA", margin, 17);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(225, 238, 232);
+      pdf.setFontSize(9);
+      pdf.text("FINANCE MANAGEMENT", margin, 24);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(13);
+      pdf.text(
+        dateFilter ? "DATE-WISE SALES REPORT" : "CALENDAR SALES REPORT",
+        pageWidth - margin,
+        17,
+        {
+        align: "right",
+        }
+      );
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(225, 238, 232);
+      pdf.setFontSize(9);
+      pdf.text(
+        dateFilter ? `Report date ${reportDateLabel}` : `Generated ${generatedDate}`,
+        pageWidth - margin,
+        25,
+        {
+        align: "right",
+        }
+      );
 
-    pdf.save("badriyya-calendar-sales-report.pdf");
-  };
+      const summaryCards = [
+        {
+          label: "TOTAL SALES",
+          value: money(reportTotals.sales),
+          color: [23, 107, 91],
+        },
+        {
+          label: "CASH RECEIVED",
+          value: money(reportTotals.cash),
+          color: [42, 127, 93],
+        },
+        {
+          label: "GPAY RECEIVED",
+          value: money(reportTotals.gpay),
+          color: [53, 112, 153],
+        },
+        {
+          label: "PENDING BALANCE",
+          value: money(reportTotals.pending),
+          color: [180, 119, 45],
+        },
+      ];
+      const cardGap = 5;
+      const cardWidth = (pageWidth - margin * 2 - cardGap * 3) / 4;
+      const cardY = 49;
+      const cardHeight = 24;
 
-  const downloadSalesmanReport = () => {
-    if (!salesmanTotals.length) {
-      setMessage("No sales records available for the salesman report.");
+      summaryCards.forEach((card, index) => {
+        const x = margin + index * (cardWidth + cardGap);
+        pdf.setFillColor(248, 250, 248);
+        pdf.setDrawColor(226, 234, 229);
+        pdf.roundedRect(x, cardY, cardWidth, cardHeight, 2, 2, "FD");
+        pdf.setFillColor(...card.color);
+        pdf.roundedRect(x, cardY, 2, cardHeight, 1, 1, "F");
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(8);
+        pdf.setTextColor(107, 126, 118);
+        pdf.text(card.label, x + 7, cardY + 8);
+        pdf.setFontSize(12);
+        pdf.setTextColor(30, 55, 48);
+        pdf.text(card.value, x + 7, cardY + 18);
+      });
+
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9);
+      pdf.setTextColor(89, 107, 99);
+      const topSalesmanText = reportTopSalesman
+        ? `${reportTopSalesman[0]} - ${money(reportTopSalesman[1])}`
+        : "N/A";
+      pdf.text(`Top salesman: ${topSalesmanText}`, margin, 82);
+      if (!dateFilter && todayTopSalesman) {
+        pdf.text(
+          `Today's top: ${todayTopSalesman.name} - ${money(todayTopSalesman.total)}`,
+          pageWidth / 2,
+          82
+        );
+      }
+      pdf.text(
+        `Total calendars: ${reportTotals.quantity.toLocaleString("en-IN")}  |  Entries: ${reportRecords.length}`,
+        pageWidth - margin,
+        82,
+        { align: "right" }
+      );
+
+      autoTable(pdf, {
+        startY: 88,
+        margin: { left: margin, right: margin, bottom: 17 },
+        head: [["Salesman", "Place", "Date", "Qty", "Amount", "Cash", "GPay", "Pending"]],
+        body: reportRecords.map((entry) => [
+          entry.salesmanName || "-",
+          entry.place || "-",
+          entry.date
+            ? new Date(`${entry.date}T12:00:00`).toLocaleDateString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
+            : "-",
+          Number(entry.quantity || 0).toLocaleString("en-IN"),
+          money(entry.amount || 0),
+          money(entry.cashReceived || 0),
+          money(entry.gpayReceived || 0),
+          money(
+            entry.pending ??
+              Math.max(
+                Number(entry.amount || 0) -
+                  Number(entry.cashReceived || 0) -
+                  Number(entry.gpayReceived || 0),
+                0
+              )
+          ),
+        ]),
+        styles: {
+          font: "helvetica",
+          fontSize: 8,
+          cellPadding: 3.2,
+          textColor: [45, 64, 57],
+          lineColor: [231, 237, 233],
+          lineWidth: 0.15,
+        },
+        headStyles: {
+          fillColor: [23, 58, 53],
+          textColor: [255, 255, 255],
+          fontStyle: "bold",
+          cellPadding: 4,
+        },
+        alternateRowStyles: { fillColor: [246, 249, 246] },
+        columnStyles: {
+          0: { cellWidth: 39 },
+          1: { cellWidth: 39 },
+          2: { cellWidth: 31 },
+          3: { cellWidth: 20, halign: "right" },
+          4: { cellWidth: 36, halign: "right" },
+          5: { cellWidth: 34, halign: "right" },
+          6: { cellWidth: 34, halign: "right" },
+          7: { cellWidth: 34, halign: "right" },
+        },
+        didDrawPage: () => {
+          const pageHeight = pdf.internal.pageSize.getHeight();
+          pdf.setDrawColor(222, 231, 225);
+          pdf.line(margin, pageHeight - 12, pageWidth - margin, pageHeight - 12);
+          pdf.setFont("helvetica", "normal");
+          pdf.setFontSize(8);
+          pdf.setTextColor(117, 132, 124);
+          pdf.text("Calendar Sales Management by BOSS", margin, pageHeight - 7);
+          pdf.text(
+            `Page ${pdf.internal.getNumberOfPages()}`,
+            pageWidth - margin,
+            pageHeight - 7,
+            { align: "right" }
+          );
+        },
+      });
+
+      pdf.save(
+        dateFilter
+          ? `badriyya-calendar-sales-${dateFilter}.pdf`
+          : "badriyya-calendar-sales-report.pdf"
+      );
+    } catch (error) {
+      console.error("Calendar sales PDF generation failed:", error);
+      setMessage("Could not create the PDF report. Please try again.");
       setMessageType("error");
-      return;
+    } finally {
+      setDownloadingReport(false);
     }
-
-    const pdf = new jsPDF({ orientation: "landscape" });
-    pdf.setFontSize(18);
-    pdf.text("BADRIYYA Salesman-wise Sales Report", 14, 18);
-    pdf.setFontSize(10);
-    pdf.text(`Generated: ${new Date().toLocaleDateString("en-IN")}`, 14, 25);
-    pdf.text(`Total Sales: ${money(totalRecordedSales)}`, 14, 32);
-    pdf.text(`Total Quantity: ${totalRecordedQuantity.toLocaleString("en-IN")}`, 120, 32);
-
-    autoTable(pdf, {
-      startY: 39,
-      head: [[
-        "Salesman",
-        "Entries",
-        "Quantity",
-        "Total Sale",
-        "Cash",
-        "GPay",
-        "Pending",
-      ]],
-      body: salesmanTotals.map((item) => [
-        item.name,
-        String(item.entries),
-        item.quantity.toLocaleString("en-IN"),
-        money(item.sales),
-        money(item.cash),
-        money(item.gpay),
-        money(item.pending),
-      ]),
-      foot: [[
-        "Grand Total",
-        String(records.length),
-        totalRecordedQuantity.toLocaleString("en-IN"),
-        money(totalRecordedSales),
-        money(totalRecordedCash),
-        money(totalRecordedGpay),
-        money(salesmanTotals.reduce((total, item) => total + item.pending, 0)),
-      ]],
-      styles: { fontSize: 9 },
-      headStyles: { fillColor: [37, 99, 235] },
-      footStyles: { fillColor: [5, 150, 105], fontStyle: "bold" },
-      alternateRowStyles: { fillColor: [248, 250, 252] },
-    });
-
-    pdf.save("badriyya-salesman-total-sales-report.pdf");
   };
 
   const updateField = (event) => {
@@ -433,16 +520,6 @@ function CalendarSales() {
     }
   };
 
-  const shareDashboard = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setShareMessage("Dashboard link copied. Share it with anyone.");
-    } catch (error) {
-      console.error("Dashboard link copy failed:", error);
-      setShareMessage("Could not copy the link. Copy it from your browser address bar.");
-    }
-  };
-
   return (
     <main className="premium-sales-page">
       <header className="premium-topbar">
@@ -454,32 +531,18 @@ function CalendarSales() {
           <span className="brand-symbol">B</span>
           <span>
             <strong>BADRIYYA</strong>
-            <small>FINANCE MANAGEMENT</small>
+            <small>FINANCE</small>
           </span>
         </button>
 
-        <div className="premium-topbar-actions">
-          <button
-            type="button"
-            className="premium-share-button"
-            onClick={shareDashboard}
-          >
-            Share Dashboard
-          </button>
-          <button
-            type="button"
-            className="premium-back"
-            onClick={() => navigate("/dashboard")}
-          >
-            ← Dashboard
-          </button>
-        </div>
+        <button
+          type="button"
+          className="premium-back"
+          onClick={() => navigate("/dashboard")}
+        >
+          ← Dashboard
+        </button>
       </header>
-      {shareMessage && (
-        <div className="premium-share-status" role="status">
-          {shareMessage}
-        </div>
-      )}
 
       <section className="premium-hero">
         <div className="hero-copy">
@@ -511,28 +574,21 @@ function CalendarSales() {
         <article className="premium-stat stat-indigo">
           <span className="stat-icon">▦</span>
           <span className="stat-label">CALENDAR QUANTITY</span>
-          <strong>{quantity.toLocaleString("en-IN")}</strong>
-          <small>Calendars in this entry</small>
+          <strong>{totalRecordedQuantity.toLocaleString("en-IN")}</strong>
+          <small>Total calendars sold</small>
         </article>
 
         <article className="premium-stat stat-violet">
           <span className="stat-icon">₹</span>
-          <span className="stat-label">SALE VALUE</span>
-          <strong>{money(amount)}</strong>
-          <small>Total sale amount</small>
-        </article>
-
-        <article className="premium-stat stat-green">
-          <span className="stat-icon">↗</span>
-          <span className="stat-label">TOTAL COLLECTION</span>
-          <strong>{money(totalCollected)}</strong>
-          <small>Cash + GPay</small>
+          <span className="stat-label">TOTAL SALES</span>
+          <strong>{money(totalRecordedSales)}</strong>
+          <small>Saved sale amount</small>
         </article>
 
         <article className="premium-stat stat-orange">
           <span className="stat-icon">◷</span>
-          <span className="stat-label">PENDING AMOUNT</span>
-          <strong>{money(pending)}</strong>
+          <span className="stat-label">TOTAL PENDING</span>
+          <strong>{money(totalRecordedPending)}</strong>
           <small>Balance to collect</small>
         </article>
       </section>
@@ -832,199 +888,7 @@ function CalendarSales() {
         </aside>
       </form>
 
-      <section className="premium-analytics-panel">
-        <div className="premium-record-header">
-          <div>
-            <span className="eyebrow record-eyebrow">ANALYTICS</span>
-            <h2>Top Salesman & Report</h2>
-          </div>
-          <button
-            type="button"
-            className="premium-download-button"
-            onClick={downloadPDF}
-          >
-            Download PDF
-          </button>
-        </div>
-
-        <div className="premium-analytics-grid">
-          <div className="premium-chart-card">
-            <h3>Top Salesman</h3>
-            {salesmanChartData.length === 0 ? (
-              <div className="premium-empty-state">No sales data yet.</div>
-            ) : (
-              <div className="premium-chart-list">
-                {salesmanChartData.map((item) => (
-                  <div key={item.name} className="premium-chart-row">
-                    <div className="premium-chart-label-wrap">
-                      <span>{item.name}</span>
-                      <strong>{money(item.total)}</strong>
-                    </div>
-                    <div className="premium-chart-track">
-                      <div
-                        className="premium-chart-fill"
-                        style={{ width: `${(item.total / maxChartValue) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="premium-kpi-card">
-            <h3>Day Top Salesman</h3>
-            {todayTopSalesman ? (
-              <>
-                <div className="premium-kpi-name">{todayTopSalesman.name}</div>
-                <div className="premium-kpi-value">{money(todayTopSalesman.total)}</div>
-                <small>Today's best performer</small>
-              </>
-            ) : (
-              <div className="premium-empty-state">No sales today yet.</div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section className="premium-record-panel">
-        <div className="premium-record-header">
-          <div>
-            <span className="eyebrow record-eyebrow">SALESMAN REPORT</span>
-            <h2>Total Sales by Salesman</h2>
-          </div>
-          <div className="premium-record-actions">
-            <span className="record-count">{salesmanTotals.length} salesmen</span>
-            <button
-              type="button"
-              className="premium-download-button"
-              onClick={downloadSalesmanReport}
-              disabled={!salesmanTotals.length}
-            >
-              Download Sales Report PDF
-            </button>
-          </div>
-        </div>
-
-        {loadingRecords ? (
-          <div className="premium-record-loading">Loading salesman report...</div>
-        ) : salesmanTotals.length === 0 ? (
-          <div className="premium-record-empty">
-            No sales records available for the salesman report.
-          </div>
-        ) : (
-          <div className="premium-record-table-wrap">
-            <table className="premium-record-table salesman-report-table">
-              <thead>
-                <tr>
-                  <th>Salesman</th>
-                  <th>Entries</th>
-                  <th>Total Quantity</th>
-                  <th>Total Sale</th>
-                  <th>Total Cash</th>
-                  <th>Total GPay</th>
-                  <th>Total Pending</th>
-                </tr>
-              </thead>
-              <tbody>
-                {salesmanTotals.map((item) => (
-                  <tr key={item.name}>
-                    <td>{item.name}</td>
-                    <td>{item.entries}</td>
-                    <td>{item.quantity.toLocaleString("en-IN")}</td>
-                    <td>{money(item.sales)}</td>
-                    <td>{money(item.cash)}</td>
-                    <td>{money(item.gpay)}</td>
-                    <td>{money(item.pending)}</td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <th>Grand Total</th>
-                  <th>{records.length}</th>
-                  <th>{totalRecordedQuantity.toLocaleString("en-IN")}</th>
-                  <th>{money(totalRecordedSales)}</th>
-                  <th>{money(totalRecordedCash)}</th>
-                  <th>{money(totalRecordedGpay)}</th>
-                  <th>
-                    {money(
-                      salesmanTotals.reduce(
-                        (total, item) => total + item.pending,
-                        0
-                      )
-                    )}
-                  </th>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        )}
-      </section>
-
-      <section className="premium-record-panel">
-        <div className="premium-record-header">
-          <div>
-            <span className="eyebrow record-eyebrow">COLLECTIONS</span>
-            <h2>Cash &amp; GPay Records</h2>
-          </div>
-          <span className="record-count">{paymentRecords.length} entries</span>
-        </div>
-
-        {loadingRecords ? (
-          <div className="premium-record-loading">Loading records...</div>
-        ) : paymentRecords.length === 0 ? (
-          <div className="premium-record-empty">
-            No cash or GPay collections recorded yet.
-          </div>
-        ) : (
-          <div className="premium-record-table-wrap">
-            <table className="premium-record-table">
-              <thead>
-                <tr>
-                  <th>Salesman</th>
-                  <th>Place</th>
-                  <th>Date</th>
-                  <th>Cash</th>
-                  <th>GPay</th>
-                  <th>Total Collected</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paymentRecords.map((entry) => (
-                  <tr key={entry.id}>
-                    <td>{entry.salesmanName || "-"}</td>
-                    <td>{entry.place || "-"}</td>
-                    <td>
-                      {entry.date
-                        ? new Date(`${entry.date}T12:00:00`).toLocaleDateString(
-                            "en-IN",
-                            {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                            }
-                          )
-                        : "-"}
-                    </td>
-                    <td>{money(entry.cashReceived || 0)}</td>
-                    <td>{money(entry.gpayReceived || 0)}</td>
-                    <td>
-                      {money(
-                        entry.totalCollected ??
-                          Number(entry.cashReceived || 0) +
-                            Number(entry.gpayReceived || 0)
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-
-      <section className="premium-record-panel">
+      <section className="premium-record-panel compact-record-panel">
         <div className="premium-record-header">
           <div>
             <span className="eyebrow record-eyebrow">RECORDS</span>
@@ -1036,8 +900,26 @@ function CalendarSales() {
               type="button"
               className="premium-download-button"
               onClick={downloadPDF}
+              disabled={downloadingReport}
             >
-              Download PDF
+              {downloadingReport ? "Preparing PDF..." : "Download PDF"}
+            </button>
+            <label className="report-date-picker">
+              <span>Report date</span>
+              <input
+                type="date"
+                value={reportDate}
+                onChange={(event) => setReportDate(event.target.value)}
+                aria-label="Select a date for the sales report"
+              />
+            </label>
+            <button
+              type="button"
+              className="premium-download-button date-report-button"
+              onClick={() => downloadPDF(reportDate)}
+              disabled={!reportDate || downloadingReport}
+            >
+              {downloadingReport ? "Preparing..." : "Download Date Report"}
             </button>
           </div>
         </div>
@@ -1052,7 +934,7 @@ function CalendarSales() {
             <strong>{money(totalRecordedGpay)}</strong>
           </article>
           <article className="saved-sales-summary-card quantity-summary-card">
-            <span>Total Calendar Quantity</span>
+            <span>Total Quantity</span>
             <strong>{totalRecordedQuantity.toLocaleString("en-IN")}</strong>
           </article>
         </div>

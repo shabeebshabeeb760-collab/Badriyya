@@ -7,12 +7,15 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
+import { useNavigate } from "react-router-dom";
 import { db } from "../firebase/firebase";
+
 import BackButton from "../components/BackButton";
-import "./IncomeList.css";
 import "./IncomeList.css";
 
 function IncomeList() {
+  const navigate = useNavigate();
+
   const [income, setIncome] = useState([]);
   const [search, setSearch] = useState("");
 
@@ -32,7 +35,9 @@ function IncomeList() {
 
   const loadIncome = async () => {
     try {
-      const snapshot = await getDocs(collection(db, "income"));
+      const snapshot = await getDocs(
+        collection(db, "income")
+      );
 
       const list = snapshot.docs.map((d) => ({
         id: d.id,
@@ -87,13 +92,16 @@ function IncomeList() {
     if (!editingId) return;
 
     try {
-      await updateDoc(doc(db, "income", editingId), {
-        date: editForm.date,
-        amount: Number(editForm.amount),
-        category: editForm.category,
-        receivedFrom: editForm.receivedFrom,
-        description: editForm.description,
-      });
+      await updateDoc(
+        doc(db, "income", editingId),
+        {
+          date: editForm.date,
+          amount: Number(editForm.amount),
+          category: editForm.category,
+          receivedFrom: editForm.receivedFrom,
+          description: editForm.description,
+        }
+      );
 
       alert("Income Updated Successfully");
 
@@ -135,10 +143,14 @@ function IncomeList() {
   // =========================
 
   const deleteIncome = async (id) => {
-    if (!window.confirm("Delete this income?")) return;
+    if (!window.confirm("Delete this income?")) {
+      return;
+    }
 
     try {
-      await deleteDoc(doc(db, "income", id));
+      await deleteDoc(
+        doc(db, "income", id)
+      );
 
       alert("Income Deleted");
 
@@ -150,37 +162,76 @@ function IncomeList() {
   };
 
   // =========================
+  // RECEIPT
+  // =========================
+
+  const openReceipt = (id) => {
+    navigate(`/receipt/${id}`);
+  };
+
+  // =========================
   // SEARCH
   // =========================
 
-  const filtered = income.filter((item) =>
-    item.category?.toLowerCase().includes(search.toLowerCase()) ||
-    item.receivedFrom?.toLowerCase().includes(search.toLowerCase()) ||
-    item.description?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = income.filter((item) => {
+    const searchText = search.toLowerCase();
+
+    return (
+      item.category
+        ?.toLowerCase()
+        .includes(searchText) ||
+
+      item.receivedFrom
+        ?.toLowerCase()
+        .includes(searchText) ||
+
+      item.description
+        ?.toLowerCase()
+        .includes(searchText)
+    );
+  });
+
+  // =========================
+  // UI
+  // =========================
 
   return (
     <div className="income-list">
 
       <BackButton />
 
+      {/* =========================
+          HEADER
+      ========================= */}
+
       <div className="income-list-header">
+
         <div>
           <h2>Income List</h2>
-          <p>Manage all income transactions</p>
+
+          <p>
+            Manage all income transactions
+          </p>
         </div>
 
         <div className="income-count">
           Total: {filtered.length}
         </div>
+
       </div>
+
+      {/* =========================
+          SEARCH
+      ========================= */}
 
       <input
         className="income-search"
         type="text"
         placeholder="Search category, name or description..."
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) =>
+          setSearch(e.target.value)
+        }
       />
 
       {/* =========================
@@ -196,6 +247,8 @@ function IncomeList() {
 
             <div className="edit-grid">
 
+              {/* DATE */}
+
               <div>
                 <label>Date</label>
 
@@ -207,6 +260,8 @@ function IncomeList() {
                   required
                 />
               </div>
+
+              {/* AMOUNT */}
 
               <div>
                 <label>Amount</label>
@@ -221,6 +276,8 @@ function IncomeList() {
                 />
               </div>
 
+              {/* CATEGORY */}
+
               <div>
                 <label>Category</label>
 
@@ -233,8 +290,12 @@ function IncomeList() {
                 />
               </div>
 
+              {/* RECEIVED FROM */}
+
               <div>
-                <label>Received From</label>
+                <label>
+                  Received From
+                </label>
 
                 <input
                   type="text"
@@ -246,6 +307,8 @@ function IncomeList() {
 
             </div>
 
+            {/* DESCRIPTION */}
+
             <div>
               <label>Description</label>
 
@@ -255,6 +318,8 @@ function IncomeList() {
                 onChange={handleEditChange}
               />
             </div>
+
+            {/* EDIT ACTIONS */}
 
             <div className="edit-actions">
 
@@ -276,6 +341,7 @@ function IncomeList() {
             </div>
 
           </form>
+
         </div>
       )}
 
@@ -288,6 +354,7 @@ function IncomeList() {
         <table>
 
           <thead>
+
             <tr>
               <th>Date</th>
               <th>Received From</th>
@@ -295,6 +362,7 @@ function IncomeList() {
               <th>Amount</th>
               <th>Action</th>
             </tr>
+
           </thead>
 
           <tbody>
@@ -302,7 +370,10 @@ function IncomeList() {
             {filtered.length === 0 ? (
 
               <tr>
-                <td colSpan="5" className="no-data">
+                <td
+                  colSpan="5"
+                  className="no-data"
+                >
                   No income found
                 </td>
               </tr>
@@ -313,28 +384,66 @@ function IncomeList() {
 
                 <tr key={item.id}>
 
-                  <td>{item.date}</td>
-
-                  <td>{item.receivedFrom || "-"}</td>
-
-                  <td>{item.category}</td>
+                  {/* DATE */}
 
                   <td>
-                    ₹ {Number(item.amount || 0).toLocaleString("en-IN")}
+                    {item.date || "-"}
                   </td>
 
+                  {/* NAME */}
+
                   <td>
+                    {item.receivedFrom || "-"}
+                  </td>
+
+                  {/* CATEGORY */}
+
+                  <td>
+                    {item.category || "-"}
+                  </td>
+
+                  {/* AMOUNT */}
+
+                  <td>
+                    ₹{" "}
+                    {Number(
+                      item.amount || 0
+                    ).toLocaleString("en-IN")}
+                  </td>
+
+                  {/* ACTION */}
+
+                  <td className="action-buttons">
+
+                    {/* RECEIPT */}
+
+                    <button
+                      className="receipt-btn"
+                      onClick={() =>
+                        openReceipt(item.id)
+                      }
+                    >
+                      🧾 Receipt
+                    </button>
+
+                    {/* EDIT */}
 
                     <button
                       className="edit-btn"
-                      onClick={() => startEdit(item)}
+                      onClick={() =>
+                        startEdit(item)
+                      }
                     >
                       ✏️ Edit
                     </button>
 
+                    {/* DELETE */}
+
                     <button
                       className="delete-btn"
-                      onClick={() => deleteIncome(item.id)}
+                      onClick={() =>
+                        deleteIncome(item.id)
+                      }
                     >
                       🗑 Delete
                     </button>

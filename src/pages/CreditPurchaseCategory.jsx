@@ -8,10 +8,6 @@ import {
   doc,
 } from "firebase/firestore";
 
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import * as XLSX from "xlsx";
-
 import { db } from "../firebase/firebase";
 import { useParams } from "react-router-dom";
 
@@ -229,144 +225,159 @@ function CreditPurchaseCategory() {
   // DOWNLOAD PDF
   // =========================
 
-  const downloadPDF = () => {
+  const downloadPDF = async () => {
     if (records.length === 0) {
       alert("No records available");
       return;
     }
 
-    const pdf = new jsPDF();
+    try {
+      const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+        import("jspdf"),
+        import("jspdf-autotable"),
+      ]);
+      const pdf = new jsPDF();
 
-    pdf.setFontSize(18);
+      pdf.setFontSize(18);
 
-    pdf.text(
-      `${categoryName} Credit Purchase Report`,
-      14,
-      20
-    );
+      pdf.text(
+        `${categoryName} Credit Purchase Report`,
+        14,
+        20
+      );
 
-    pdf.setFontSize(11);
+      pdf.setFontSize(11);
 
-    pdf.text(
-      `Total Cost: Rs. ${totalCost.toLocaleString(
-        "en-IN"
-      )}`,
-      14,
-      30
-    );
+      pdf.text(
+        `Total Cost: Rs. ${totalCost.toLocaleString(
+          "en-IN"
+        )}`,
+        14,
+        30
+      );
 
-    pdf.text(
-      `Total Income: Rs. ${totalIncome.toLocaleString(
-        "en-IN"
-      )}`,
-      14,
-      37
-    );
+      pdf.text(
+        `Total Income: Rs. ${totalIncome.toLocaleString(
+          "en-IN"
+        )}`,
+        14,
+        37
+      );
 
-    pdf.text(
-      `Pending Balance: Rs. ${pendingBalance.toLocaleString(
-        "en-IN"
-      )}`,
-      14,
-      44
-    );
+      pdf.text(
+        `Pending Balance: Rs. ${pendingBalance.toLocaleString(
+          "en-IN"
+        )}`,
+        14,
+        44
+      );
 
-    autoTable(pdf, {
-      startY: 52,
+      autoTable(pdf, {
+        startY: 52,
 
-      head: [
-        [
-          "Date",
-          "Amount",
-          "Type",
+        head: [
+          [
+            "Date",
+            "Amount",
+            "Type",
+          ],
         ],
-      ],
 
-      body: records.map((item) => [
-        item.date || "-",
+        body: records.map((item) => [
+          item.date || "-",
 
-        `Rs. ${Number(
-          item.amount || 0
-        ).toLocaleString("en-IN")}`,
+          `Rs. ${Number(
+            item.amount || 0
+          ).toLocaleString("en-IN")}`,
 
-        item.type || "-",
-      ]),
+          item.type || "-",
+        ]),
 
-      styles: {
-        fontSize: 10,
-      },
+        styles: {
+          fontSize: 10,
+        },
 
-      headStyles: {
-        fillColor: [23, 32, 51],
-      },
-    });
+        headStyles: {
+          fillColor: [23, 32, 51],
+        },
+      });
 
-    pdf.save(
-      `${categoryName}-Credit-Purchase-Report.pdf`
-    );
+      pdf.save(
+        `${categoryName}-Credit-Purchase-Report.pdf`
+      );
+    } catch (error) {
+      console.error("Credit purchase PDF generation failed:", error);
+      alert("Could not create the PDF report. Please try again.");
+    }
   };
 
   // =========================
   // DOWNLOAD EXCEL
   // =========================
 
-  const downloadExcel = () => {
+  const downloadExcel = async () => {
     if (records.length === 0) {
       alert("No records available");
       return;
     }
 
-    const data = records.map((item) => ({
+    try {
+      const XLSX = await import("xlsx");
+      const data = records.map((item) => ({
       Date: item.date || "",
       Category: item.category || "",
       Amount: Number(item.amount || 0),
       Type: item.type || "",
-    }));
+      }));
 
-    data.push({
+      data.push({
       Date: "",
       Category: "",
       Amount: "",
       Type: "",
-    });
+      });
 
-    data.push({
+      data.push({
       Date: "Total Cost",
       Category: "",
       Amount: totalCost,
       Type: "",
-    });
+      });
 
-    data.push({
+      data.push({
       Date: "Total Income",
       Category: "",
       Amount: totalIncome,
       Type: "",
-    });
+      });
 
-    data.push({
+      data.push({
       Date: "Pending Balance",
       Category: "",
       Amount: pendingBalance,
       Type: "",
-    });
+      });
 
-    const worksheet =
-      XLSX.utils.json_to_sheet(data);
+      const worksheet =
+        XLSX.utils.json_to_sheet(data);
 
-    const workbook =
-      XLSX.utils.book_new();
+      const workbook =
+        XLSX.utils.book_new();
 
-    XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
-      categoryName.substring(0, 31)
-    );
+      XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        categoryName.substring(0, 31)
+      );
 
-    XLSX.writeFile(
-      workbook,
-      `${categoryName}-Credit-Purchase-Report.xlsx`
-    );
+      XLSX.writeFile(
+        workbook,
+        `${categoryName}-Credit-Purchase-Report.xlsx`
+      );
+    } catch (error) {
+      console.error("Credit purchase Excel generation failed:", error);
+      alert("Could not create the Excel report. Please try again.");
+    }
   };
 
   return (

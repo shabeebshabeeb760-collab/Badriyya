@@ -8,9 +8,9 @@
   padding: 20px;
 }
 
-/* ===============================
+/* =========================
    BUTTONS
-================================ */
+========================= */
 
 .receipt-actions {
   width: 1129px;
@@ -18,16 +18,20 @@
   margin: 0 auto 15px;
 
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+
   gap: 8px;
 }
 
 .receipt-actions button {
-  border: 0;
-  border-radius: 5px;
-  padding: 9px 14px;
+  border: none;
+  border-radius: 6px;
+
+  padding: 10px 15px;
 
   color: white;
+
   font-size: 13px;
   font-weight: 700;
 
@@ -43,14 +47,17 @@
   background: #0877df;
 }
 
-.pdf-button {
-  background: #168447;
+.close-button {
+  background: #dc2626;
 }
 
+.receipt-actions button:hover {
+  opacity: 0.9;
+}
 
-/* ===============================
+/* =========================
    RECEIPT
-================================ */
+========================= */
 
 .receipt {
   position: relative;
@@ -75,21 +82,22 @@
   padding: 0;
 }
 
-
-/* ===============================
+/* =========================
    DATE
-
-   Image size = 1129 x 1600
-
-   Date goes exactly after
-   "Date:"
-================================ */
+========================= */
 
 .dynamic-date {
   position: absolute;
 
-  left: 70.5%;
-  top: 18.15%;
+  /*
+    Original image:
+    1806 x 2560
+
+    Date position
+  */
+
+  left: 63.0%;
+  top: 19.25%;
 
   z-index: 20;
 
@@ -103,48 +111,41 @@
   white-space: nowrap;
 }
 
-
-/* ===============================
-   COVER OLD STATIC NAME
-
-   The uploaded image already has
-   an old printed name.
-
-   This white area hides it.
-================================ */
+/* =========================
+   OLD NAME COVER
+========================= */
 
 .name-cover {
   position: absolute;
 
-  left: 11.8%;
-  top: 41.9%;
+  left: 11.5%;
+  top: 65.0%;
 
-  width: 65%;
-  height: 4.0%;
+  width: 55%;
+  height: 4.5%;
 
   z-index: 15;
 
   background: white;
 }
 
-
-/* ===============================
-   NEW FIREBASE NAME
-================================ */
+/* =========================
+   NEW NAME
+========================= */
 
 .dynamic-name {
   position: absolute;
 
   left: 12%;
-  top: 42.35%;
+  top: 65.8%;
 
-  width: 70%;
+  width: 65%;
 
   z-index: 20;
 
   font-family: Arial, Helvetica, sans-serif;
 
-  font-size: 29px;
+  font-size: 25px;
   font-weight: 800;
 
   line-height: 1.15;
@@ -154,22 +155,22 @@
   white-space: nowrap;
 
   overflow: hidden;
+
   text-overflow: ellipsis;
 }
 
-
-/* ===============================
+/* =========================
    CASH BOX
-================================ */
+========================= */
 
 .dynamic-cash {
   position: absolute;
 
-  left: 11.25%;
-  top: 47.2%;
+  left: 11.2%;
+  top: 53.6%;
 
   width: 23.5%;
-  height: 4.75%;
+  height: 4.8%;
 
   z-index: 20;
 
@@ -177,17 +178,16 @@
 
   overflow: hidden;
 
-  border: 2px solid #777;
+  border: 2px solid #555;
 
   border-radius: 9px;
 
   background: white;
 }
 
-
-/* ===============================
+/* =========================
    RUPEE
-================================ */
+========================= */
 
 .cash-rupee {
   width: 29%;
@@ -197,20 +197,20 @@
   align-items: center;
   justify-content: center;
 
-  background: #284bc9;
+  background: #a51f4b;
 
   color: white;
 
-  font-family: Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
 
   font-size: 35px;
+
   font-weight: 500;
 }
 
-
-/* ===============================
+/* =========================
    CASH CONTENT
-================================ */
+========================= */
 
 .cash-content {
   flex: 1;
@@ -220,18 +220,16 @@
   align-items: center;
   justify-content: center;
 
-  gap: 12px;
+  gap: 10px;
 
   background: white;
 }
 
-
-/* CASH */
-
 .cash-text {
   font-family: Arial, Helvetica, sans-serif;
 
-  font-size: 18px;
+  font-size: 17px;
+
   font-weight: 800;
 
   letter-spacing: 1px;
@@ -239,43 +237,42 @@
   color: #222;
 }
 
-
-/* AMOUNT */
-
 .cash-amount {
   font-family: Arial, Helvetica, sans-serif;
 
-  font-size: 18px;
+  font-size: 17px;
+
   font-weight: 800;
 
   color: #222;
 }
 
-
-/* ===============================
+/* =========================
    LOADING
-================================ */
+========================= */
 
 .receipt-loading {
   min-height: 100vh;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
 
   font-size: 22px;
+
   font-weight: 700;
 }
 
-
-/* ===============================
+/* =========================
    ERROR
-================================ */
+========================= */
 
 .receipt-error {
   min-height: 100vh;
 
   display: flex;
+
   flex-direction: column;
 
   align-items: center;
@@ -284,21 +281,27 @@
   gap: 15px;
 }
 
+.receipt-error h2 {
+  color: #dc2626;
+}
+
 .receipt-error button {
   padding: 10px 20px;
-  border: 0;
-  border-radius: 5px;
+
+  border: none;
+
+  border-radius: 6px;
 
   background: #1769d1;
+
   color: white;
 
   cursor: pointer;
 }
 
-
-/* ===============================
+/* =========================
    MOBILE
-================================ */
+========================= */
 
 @media (max-width: 600px) {
 
@@ -311,16 +314,20 @@
   }
 
   .receipt-actions button {
-    padding: 7px 8px;
+    padding: 7px 9px;
     font-size: 10px;
   }
 
   .dynamic-date {
-    font-size: 7px;
+    font-size: 8px;
   }
 
   .dynamic-name {
     font-size: 11px;
+  }
+
+  .dynamic-cash {
+    border-width: 1px;
   }
 
   .cash-rupee {
@@ -337,10 +344,9 @@
   }
 }
 
-
-/* ===============================
+/* =========================
    PRINT
-================================ */
+========================= */
 
 @media print {
 
@@ -353,14 +359,12 @@
   body {
     margin: 0 !important;
     padding: 0 !important;
-
     background: white !important;
   }
 
   .receipt-page {
     padding: 0 !important;
     margin: 0 !important;
-
     background: white !important;
   }
 
@@ -371,7 +375,6 @@
   .receipt {
     width: 100% !important;
     max-width: none !important;
-
     margin: 0 !important;
   }
 }

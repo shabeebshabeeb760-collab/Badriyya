@@ -1,121 +1,41 @@
-import { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/firebase";
-
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-
 import "./Receipt.css";
 
-export default function Receipt() {
+function Receipt() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const receiptRef = useRef(null);
 
   const [income, setIncome] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getIncome = async () => {
+    const loadIncome = async () => {
       try {
-        const ref = doc(db, "income", id);
-        const snap = await getDoc(ref);
+        const snap = await getDoc(doc(db, "income", id));
 
-        if (snap.exists()) {
-          setIncome(snap.data());
+        if (!snap.exists()) {
+          setIncome(null);
+          return;
         }
+
+        setIncome({
+          id: snap.id,
+          ...snap.data(),
+        });
       } catch (error) {
-        console.error(error);
+        console.error("Receipt error:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    getIncome();
+    if (id) {
+      loadIncome();
+    }
   }, [id]);
-
-  // -----------------------------
-  // FIREBASE VALUES
-  // -----------------------------
-
-  const name = income?.name || "";
-
-  const amount = Number(income?.amount || 0);
-
-  const formatDate = (value) => {
-    if (!value) return "";
-
-    try {
-      if (value?.toDate) {
-        return value.toDate().toLocaleDateString("en-IN", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        });
-      }
-
-      const d = new Date(value);
-
-      if (!isNaN(d.getTime())) {
-        return d.toLocaleDateString("en-IN", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        });
-      }
-
-      return String(value);
-    } catch {
-      return String(value);
-    }
-  };
-
-  const date = formatDate(income?.date);
-
-  const formattedAmount = amount.toLocaleString("en-IN");
-
-  // -----------------------------
-  // PRINT
-  // -----------------------------
-
-  const printReceipt = () => {
-    window.print();
-  };
-
-  // -----------------------------
-  // PDF
-  // -----------------------------
-
-  const downloadPDF = async () => {
-    if (!receiptRef.current) return;
-
-    try {
-      const canvas = await html2canvas(receiptRef.current, {
-        scale: 3,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-      });
-
-      const img = canvas.toDataURL("image/jpeg", 1);
-
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
-
-      const width = 210;
-      const height = (canvas.height * width) / canvas.width;
-
-      pdf.addImage(img, "JPEG", 0, 0, width, height);
-
-      pdf.save(`Receipt-${name || "Income"}.pdf`);
-    } catch (error) {
-      console.error(error);
-      alert("PDF download failed");
-    }
-  };
 
   if (loading) {
     return (
@@ -128,90 +48,96 @@ export default function Receipt() {
   if (!income) {
     return (
       <div className="receipt-error">
-        <h2>Receipt Not Found</h2>
+        <h2>Receipt not found</h2>
 
-        <button onClick={() => navigate("/income")}>
-          ← Back
+        <button onClick={() => navigate(-1)}>
+          Go Back
         </button>
       </div>
     );
   }
 
+  const date = income.date
+    ? new Date(income.date).toLocaleDateString("en-IN")
+    : "";
+
+  const name = income.receivedFrom || "";
+
+  const amount = Number(income.amount || 0).toLocaleString("en-IN");
+
   return (
     <div className="receipt-page">
 
-      {/* BUTTONS */}
+      {/* =========================
+          ACTION BUTTONS
+      ========================= */}
 
       <div className="receipt-actions">
 
         <button
           className="back-button"
-          onClick={() => navigate("/income")}
+          onClick={() => navigate(-1)}
         >
           ← Back
         </button>
 
         <button
           className="print-button"
-          onClick={printReceipt}
+          onClick={() => window.print()}
         >
           🖨 Print Receipt
         </button>
 
         <button
           className="pdf-button"
-          onClick={downloadPDF}
+          onClick={() => window.print()}
         >
-          📄 Download PDF
+          📄 Save PDF
         </button>
 
       </div>
 
 
-      {/* =================================
-          ORIGINAL RECEIPT
-      ================================= */}
+      {/* =========================
+          RECEIPT
+      ========================= */}
 
-      <div
-        className="receipt"
-        ref={receiptRef}
-      >
+      <div className="receipt">
+
+        {/* IMPORTANT:
+            Your actual file is Receipt.jpg.jpeg
+        */}
 
         <img
-          src="/receipt.jpg"
+          src="/Receipt/Receipt.jpg.jpeg"
           alt="Receipt"
           className="receipt-image"
         />
 
 
-        {/* =================================
+        {/* =========================
             DATE
-        ================================= */}
+        ========================= */}
 
         <div className="dynamic-date">
           {date}
         </div>
 
 
-        {/* =================================
-            HIDE OLD NAME FROM IMAGE
-        ================================= */}
+        {/* =========================
+            NAME
+        ========================= */}
 
         <div className="name-cover"></div>
-
-
-        {/* =================================
-            FIREBASE NAME
-        ================================= */}
 
         <div className="dynamic-name">
           {name}
         </div>
 
 
-        {/* =================================
-            CASH BOX
-        ================================= */}
+        {/* =========================
+            CASH / AMOUNT
+        ========================= */}
 
         <div className="dynamic-cash">
 
@@ -226,7 +152,7 @@ export default function Receipt() {
             </span>
 
             <span className="cash-amount">
-              {formattedAmount}
+              {amount}
             </span>
 
           </div>
@@ -238,3 +164,5 @@ export default function Receipt() {
     </div>
   );
 }
+
+export default Receipt;

@@ -9,13 +9,14 @@ import Settings from "./pages/Settings";
 import CreditPurchase from "./pages/CreditPurchase";
 import CreditPurchaseCategory from "./pages/CreditPurchaseCategory";
 import Receipt from "./pages/Receipt";
+import CalendarSales from "./pages/CalendarSales";
 import CalendarSalesDashboard from "./pages/CalendarSalesDashboard";
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/dashboard" element={<Dashboard />} />
- 
+ <Route path="/calendar-sales" element={<CalendarSales />} />
 <Route path="/receipt/:id" element={<Receipt />} />
       <Route path="/income" element={<Income />} />
       <Route path="/income/list" element={<IncomeList />} />
@@ -23,7 +24,6 @@ function App() {
   path="/credit-purchase"
   element={<CreditPurchase />}
 />
-
 <Route
   path="/calendar-sales-dashboard"
   element={<CalendarSalesDashboard />}
